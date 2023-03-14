@@ -13,6 +13,7 @@ from discord import Embed
 load_dotenv()
 
 TOKEN = os.environ['TOKEN']
+intents=discord.Intents.all()
 
 translator = googletrans.Translator()
 
