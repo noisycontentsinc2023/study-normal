@@ -12,7 +12,6 @@ from discord import Embed
 
 load_dotenv()
 
-PREFIX = os.environ['PREFIX']
 TOKEN = os.environ['TOKEN']
 
 translator = googletrans.Translator()
