@@ -38,13 +38,13 @@ flag_emoji_dict = {
 "🇰🇷": "ko",
 }
 
-client = discord.Client()
+client = discord.bot()
 
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user}.')
 
-@client.event
+@bot.event
 async def on_reaction_add(reaction, user):
   
     # Check if the reaction is a flag emoji
