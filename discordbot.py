@@ -69,7 +69,7 @@ async def on_reaction_add(reaction, user):
 async def on_message(message):
     if message.content.startswith("!로또"):
         Text = ""
-        number = [1, 2, 3, 4, 5, 6, 7] # 배열크기 선언해줌
+        number = [1, 2, 3, 4, 5, 6] # 배열크기 선언해줌
         count = 0
         for i in range(0, 7):
             num = random.randrange(1, 46)
@@ -107,24 +107,7 @@ async def on_message(message):
         await message.channel.send(embed=embed)
         
 #------------------------------------------------검색------------------------------------------------------# 
-@bot.event
-async def on_message(message):
-    if message.content.startswith('!주사위'):
 
-        randomNum = random.randrange(1, 7) # 1~6까지 랜덤수
-        print(randomNum)
-        if randomNum == 1:
-            await message.channel.send(message.channel, embed=discord.Embed(description=':game_die: '+ ':one:'))
-        if randomNum == 2:
-            await message.channel.send(message.channel, embed=discord.Embed(description=':game_die: ' + ':two:'))
-        if randomNum ==3:
-            await message.channel.send(message.channel, embed=discord.Embed(description=':game_die: ' + ':three:'))
-        if randomNum ==4:
-            await message.channel.send(message.channel, embed=discord.Embed(description=':game_die: ' + ':four:'))
-        if randomNum ==5:
-            await message.channel.send(message.channel, embed=discord.Embed(description=':game_die: ' + ':five:'))
-        if randomNum ==6:
-            await message.channel.send(message.channel, embed=discord.Embed(description=':game_die: ' + ':six: '))
 
 #Run the bot
 bot.run(TOKEN)
