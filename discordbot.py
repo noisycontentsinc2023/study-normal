@@ -4,6 +4,8 @@ from discord.utils import get
 import asyncio
 import os
 import googletrans 
+import urllib
+from urllib.request import Request, urlopen
 from discord import Embed
 
 translator = googletrans.Translator()
