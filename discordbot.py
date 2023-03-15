@@ -39,7 +39,7 @@ intents=discord.Intents.all()
 
 #------------------------------------------------Events------------------------------------------------------#
 
-@client.event
+@bot.event
 async def on_reaction_add(reaction, user):
   
     # Check if the reaction is a flag emoji
@@ -60,6 +60,6 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 #Run the bot
-client.run('TOKEN')
+bot.run('TOKEN')
     
 
