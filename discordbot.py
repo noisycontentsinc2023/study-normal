@@ -104,7 +104,7 @@ async def on_message(message):
             description=Text.strip(),
             colour=discord.Color.red()
         )
-        await bot.send(message.channel, embed=embed)
+        await message.channel.send(embed=embed)
 
 #Run the bot
 bot.run(TOKEN)
