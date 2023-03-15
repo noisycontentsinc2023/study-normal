@@ -79,7 +79,7 @@ async def on_message(message):
         req = Request(url, headers=hdr)
         html = urllib.request.urlopen(req)
         bsObj = bs4.BeautifulSoup(html, "html.parser")
-        todayBase = bsObj.find('#today_area > div.main_info > div.info_data')
+        todayBase = bsObj.find('div', {'class': 'weather_info'})
 
         todayTemp1 = todayBase.find('span', {'class': 'todaytemp'})
         todayTemp = todayTemp1.text.strip()  # 온도
