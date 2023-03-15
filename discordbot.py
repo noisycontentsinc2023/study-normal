@@ -63,6 +63,7 @@ async def on_reaction_add(reaction, user):
 
 #------------------------------------------------날씨------------------------------------------------------#
 
+@bot.command(name="날씨")
 async def on_message(message):
   
     if message.content.startswith("PREFIX + 날씨"):
