@@ -40,8 +40,6 @@ flag_emoji_dict = {
 "🇰🇷": "ko",
 }
 
-bot = commands.Bot(command_prefix=prefix, intents=intents)
-
 @bot.event
 async def on_reaction_add(reaction, user):
   
