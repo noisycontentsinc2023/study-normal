@@ -3,6 +3,7 @@ from discord.ext import tasks, commands
 from discord.utils import get
 import asyncio
 import os
+from googletrans import Translator
 from discord import Embed
 
 
