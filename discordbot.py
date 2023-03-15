@@ -4,6 +4,7 @@ from discord.utils import get
 import asyncio
 import os
 import googletrans 
+import bs4
 import urllib
 from urllib.request import Request, urlopen
 from discord import Embed
