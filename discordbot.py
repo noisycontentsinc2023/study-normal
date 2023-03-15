@@ -13,6 +13,8 @@ from discord import Embed
 load_dotenv()
 
 TOKEN = os.environ['TOKEN']
+PREFIX = os.environ['PREFIX']
+
 intents=discord.Intents.all()
 
 translator = googletrans.Translator()
@@ -38,11 +40,7 @@ flag_emoji_dict = {
 "🇰🇷": "ko",
 }
 
-client = discord.bot()
-
-@client.event
-async def on_ready():
-    print(f'Logged in as {client.user}.')
+bot = commands.Bot(command_prefix=prefix, intents=intents)
 
 @bot.event
 async def on_reaction_add(reaction, user):
