@@ -1,7 +1,6 @@
 import discord
 from discord.ext import tasks, commands
 from discord.utils import get
-from dotenv import load_dotenv
 import asyncio
 import os
 import googletrans 
@@ -60,6 +59,6 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 #Run the bot
-bot.run('TOKEN')
+bot.run(TOKEN)
     
 
