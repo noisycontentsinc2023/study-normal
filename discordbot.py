@@ -7,6 +7,7 @@ import googletrans
 from discord import Embed
 
 translator = googletrans.Translator()
+prefix = '!'
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
 # Create a dictionary of flag emojis and their corresponding language codes
