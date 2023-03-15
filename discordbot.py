@@ -63,10 +63,10 @@ async def on_reaction_add(reaction, user):
 
 #------------------------------------------------날씨------------------------------------------------------#
 
-@bot.command(name="날씨")
+@bot.event
 async def on_message(message):
   
-    if message.content.startswith("PREFIX + 날씨"):
+    if message.content.startswith('!날씨'):
         learn = message.content.split(" ")
         location = learn[1]
         enc_location = urllib.parse.quote(location+'날씨')
