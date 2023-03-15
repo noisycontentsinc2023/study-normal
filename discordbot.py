@@ -71,7 +71,7 @@ async def on_message(message):
         Text = ""
         number = [1, 2, 3, 4, 5, 6] # 배열크기 선언해줌
         count = 0
-        for i in range(0, 6):
+        for i in range(0, 7):
             num = random.randrange(1, 46)
             number[i] = num
             if count >= 1:
