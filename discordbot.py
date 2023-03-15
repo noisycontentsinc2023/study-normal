@@ -33,9 +33,9 @@ flag_emoji_dict = {
 TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
+intents=discord.Intents.all()
 prefix = '!'
 bot = commands.Bot(command_prefix=prefix, intents=intents)
-intents=discord.Intents.all()
 
 #------------------------------------------------Events------------------------------------------------------#
 
