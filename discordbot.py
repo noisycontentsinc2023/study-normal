@@ -3,12 +3,8 @@ from discord.ext import tasks, commands
 from discord.utils import get
 import asyncio
 import os
-import googlesearch
-import bs4
 from discord import Embed
-from googlesearch import search
-import urllib
-from bs4 import Beautifulsoup
+
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
@@ -66,11 +62,6 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 #------------------------------------------------검색------------------------------------------------------#
-
-@bot.command
-async def 검색(ctx,search_msg):
-  for URL in search(search_msg,stop=10):
-      await ctx.send(url)
 
 #Run the bot
 bot.run(TOKEN)
