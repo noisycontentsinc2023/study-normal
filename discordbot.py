@@ -145,7 +145,7 @@ async def on_message(message):
 
 
 
-        await client.send_message(message.channel,embed=embed)
+        await bot.send_message(message.channel,embed=embed)
 
 #Run the bot
 bot.run(TOKEN)
