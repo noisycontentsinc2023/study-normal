@@ -64,8 +64,9 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 #------------------------------------------------검색------------------------------------------------------#
-
-    if message.content.startswith("!복권"):
+@bot.event
+async def on_message(message):
+    if message.content.startswith("!로또"):
         Text = ""
         number = [1, 2, 3, 4, 5, 6, 7] # 배열크기 선언해줌
         count = 0
@@ -98,7 +99,7 @@ async def on_reaction_add(reaction, user):
 
         print(Text.strip())
         embed = discord.Embed(
-            title="복권 숫자!",
+            title=" 숫자!",
             description=Text.strip(),
             colour=discord.Color.red()
         )
