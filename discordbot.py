@@ -4,6 +4,7 @@ from discord.utils import get
 from dotenv import load_dotenv
 import asyncio
 import os
+import random
 import googletrans 
 from discord import Embed
 
