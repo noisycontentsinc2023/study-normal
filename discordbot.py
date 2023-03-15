@@ -2,20 +2,10 @@ import discord
 from discord.ext import tasks, commands
 from discord.utils import get
 from dotenv import load_dotenv
-from cmath import log
-from distutils.sysconfig import PREFIX
-from dotenv import load_dotenv
 import asyncio
 import os
 import googletrans 
 from discord import Embed
-
-load_dotenv()
-
-TOKEN = os.environ['TOKEN']
-PREFIX = os.environ['PREFIX']
-
-intents=discord.Intents.all()
 
 translator = googletrans.Translator()
 
@@ -40,7 +30,17 @@ flag_emoji_dict = {
 "🇰🇷": "ko",
 }
 
+#For a more secure, we loaded the .env file and assign the token value to a variable 
+TOKEN = os.environ['TOKEN']
+
+#Intents are permissions for the bot that are enabled based on the features necessary to run the bot.
+intents=discord.Intents.all()
+
+#Comman prefix is setup here, this is what you have to type to issue a command to the bot
+prefix = './'
 bot = commands.Bot(command_prefix=prefix, intents=intents)
+
+#------------------------------------------------Events------------------------------------------------------#
 
 @bot.event
 async def on_reaction_add(reaction, user):
@@ -62,8 +62,7 @@ async def on_reaction_add(reaction, user):
        # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
+#Run the bot
+bot.run(TOKEN)
+    
 
-try:
-    bot.run(TOKEN)
-except discord.errors.LoginFailure as e:
-    print("Improper token has been passed.")
