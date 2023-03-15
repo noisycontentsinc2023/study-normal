@@ -100,7 +100,7 @@ async def on_message(message):
 
         print(Text.strip())
         embed = discord.Embed(
-            title=" 숫자!",
+            title=" 망령의 추천 번호는!",
             description=Text.strip(),
             colour=discord.Color.red()
         )
