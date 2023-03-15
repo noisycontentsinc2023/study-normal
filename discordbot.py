@@ -68,7 +68,6 @@ async def on_message(message):
   
     if message.content.startswith('!날씨'):
         learn = message.content.split(" ")
-        location = learn[1]
         enc_location = urllib.parse.quote(location+'날씨')
         hdr = {'User-Agent': 'Mozilla/5.0'}
         url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=' + enc_location
@@ -129,7 +128,6 @@ async def on_message(message):
 
         embed = discord.Embed(
             title=learn[1]+ ' 날씨 정보',
-            description=learn[1]+ '날씨 정보입니다.',
             colour=discord.Colour.gold()
         )
         embed.add_field(name='현재온도', value=todayTemp+'˚', inline=False)  # 현재온도
