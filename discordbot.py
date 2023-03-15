@@ -51,7 +51,7 @@ async def on_reaction_add(reaction, user):
         # Translate the message to the desired language
         detected_lang = translator.detect(message.content)
         translated_message = translator.translate(message.content, dest=lang_code).text
-        pronunciation_message =translator.translate(message.content, dest=lang_code).pronunciation
+        pronunciation_message = translator.translate(message.content, dest=lang_code).pronunciation
 
         embed = Embed(title='번역된 문장', description=f'{translated_message}', color=0x00ff00)
         embed.add_field(name="원문", value=message.content, inline=False)
