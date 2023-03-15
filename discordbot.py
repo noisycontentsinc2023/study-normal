@@ -70,6 +70,7 @@ async def on_message(message):
   
     if message.content.startswith('!날씨'):
         learn = message.content.split(" ")
+        location = learn[1]
         enc_location = urllib.parse.quote(location+'날씨')
         hdr = {'User-Agent': 'Mozilla/5.0'}
         url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=' + enc_location
