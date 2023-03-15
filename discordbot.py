@@ -81,16 +81,16 @@ async def on_message(message):
         bsObj = bs4.BeautifulSoup(html, "html.parser")
         todayBase = bsObj.find('div', {'class': 'weather_info'})
 
-        todayTemp1 = todayBase.find('span', {'class': 'todaytemp'})
+        todayTemp1 = todayBase.find('span', {'class': 'temperature_text'})
         todayTemp = todayTemp1.text.strip()  # 온도
         print(todayTemp)
 
-        todayValueBase = todayBase.find('ul', {'class': 'info_list'})
+        todayValueBase = todayBase.find('ul', {'class': 'temperature down'})
         todayValue2 = todayValueBase.find('p', {'class': 'cast_txt'})
         todayValue = todayValue2.text.strip()  # 밝음,어제보다 ?도 높거나 낮음을 나타내줌
         print(todayValue)
 
-        todayFeelingTemp1 = todayValueBase.find('span', {'class': 'sensible'})
+        todayFeelingTemp1 = todayValueBase.find('span', {'class': 'desc'})
         todayFeelingTemp = todayFeelingTemp1.text.strip()  # 체감온도
         print(todayFeelingTemp)
 
