@@ -63,6 +63,45 @@ async def on_reaction_add(reaction, user):
 
 #------------------------------------------------검색------------------------------------------------------#
 
+    if message.content.startswith("!복권"):
+        Text = ""
+        number = [1, 2, 3, 4, 5, 6, 7] # 배열크기 선언해줌
+        count = 0
+        for i in range(0, 7):
+            num = random.randrange(1, 46)
+            number[i] = num
+            if count >= 1:
+                for i2 in range(0, i):
+                    if number[i] == number[i2]:  # 만약 현재랜덤값이 이전숫자들과 값이 같다면
+                        numberText = number[i]
+                        print("작동 이전값 : " + str(numberText))
+                        number[i] = random.randrange(1, 46)
+                        numberText = number[i]
+                        print("작동 현재값 : " + str(numberText))
+                        if number[i] == number[i2]:  # 만약 다시 생성한 랜덤값이 이전숫자들과 또 같다면
+                            numberText = number[i]
+                            print("작동 이전값 : " + str(numberText))
+                            number[i] = random.randrange(1, 46)
+                            numberText = number[i]
+                            print("작동 현재값 : " + str(numberText))
+                            if number[i] == number[i2]:  # 만약 다시 생성한 랜덤값이 이전숫자들과 또 같다면
+                                numberText = number[i]
+                                print("작동 이전값 : " + str(numberText))
+                                number[i] = random.randrange(1, 46)
+                                numberText = number[i]
+                                print("작동 현재값 : " + str(numberText))
+
+            count = count + 1
+            Text = Text + "  " + str(number[i])
+
+        print(Text.strip())
+        embed = discord.Embed(
+            title="복권 숫자!",
+            description=Text.strip(),
+            colour=discord.Color.red()
+        )
+        await bot.send_message(message.channel, embed=embed)
+
 #Run the bot
 bot.run(TOKEN)
     
