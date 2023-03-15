@@ -62,6 +62,10 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 #------------------------------------------------날씨------------------------------------------------------#
+
+@bot.command()
+async def on_message(message):
+  
     if message.content.startswith("!날씨"):
         learn = message.content.split(" ")
         location = learn[1]
