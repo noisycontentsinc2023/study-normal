@@ -1,9 +1,10 @@
 import discord
 from discord.ext import tasks, commands
 from discord.utils import get
+from dotenv import load_dotenv
 import asyncio
 import os
-from googletrans import Translator
+import googletrans 
 from discord import Embed
 
 
