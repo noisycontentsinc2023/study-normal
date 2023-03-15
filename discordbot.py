@@ -73,7 +73,7 @@ async def on_message(message):
         count = 0
         for i in range(0, 7):
             num = random.randrange(1, 46)
-            number.append(i)
+            number[i] = num
             if count >= 1:
                 for i2 in range(0, i):
                     if number[i] == number[i2]:  # 만약 현재랜덤값이 이전숫자들과 값이 같다면
