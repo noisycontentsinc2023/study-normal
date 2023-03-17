@@ -2,6 +2,7 @@ import discord
 from discord.ext import tasks
 from discord.ext import commands
 from discord.utils import get
+import urllib.request
 from dotenv import load_dotenv
 import asyncio
 import os
@@ -130,15 +131,20 @@ async def dice(ctx):
 #------------------------------------------------이벤트------------------------------------------------------# 
 @bot.command(name='이벤트')
 async def event(ctx):
-        url = baseurl + plusurl
-        res = requests.get(url).text
-        soup = BeautifulSoup(res, "html.parser")
+        hdr={'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
+        url='http://studymini.com'
+        req=urllib.request.Request(url=url, headers=hdr)
+        url_open=urllib.request.urlopen(req)
+        
+        bs=BeautifulSoup(url_open,'html.parser')
 
         #이벤트 이미지 가져오기
         img = soup.find("div", attrs={"class":"elementor-widget-container"}).find("img").get('src')
 
         embed = discord.Embed(title="현재 진행 이벤트", description="", color=0x62c1cc)
         embed.set_thumbnail(url="http:" + img)
+        
+        
 
         await ctx.send(embed=embed)
 
