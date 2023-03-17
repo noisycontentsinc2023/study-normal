@@ -9,8 +9,6 @@ import random
 import googletrans 
 import requests
 from discord import Embed
-from bs4 import BeautifulSoup
-
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
@@ -109,24 +107,26 @@ async def lotto(ctx):
     await ctx.send(embed=embed)
         
 #------------------------------------------------검색------------------------------------------------------# 
+@bot.command(name='주사위')
+async def dice(ctx):
+    if message.content.startswith('!주사위'):
+        randomNum = random.randrange(1, 7) # 1~6까지 랜덤수
+        print(randomNum)
+        if randomNum == 1:
+            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: '+ ':one:'))
+        if randomNum == 2:
+            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':two:'))
+        if randomNum ==3:
+            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':three:'))
+        if randomNum ==4:
+            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':four:'))
+        if randomNum ==5:
+            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':five:'))
+        if randomNum ==6:
+            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':six: '))
 
-@bot.command(name='검색')
-async def search(ctx, *, query):
-    # 검색어를 인코딩
-    query_encoded = requests.utils.quote(query)
-    
-    # 검색 결과 페이지 URL
-    search_url = f'https://search.naver.com/search.naver?query={query_encoded}'
-    
-    # 검색 결과 페이지를 가져와서 BeautifulSoup 객체 생성
-    response = requests.get(search_url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    
-    # 검색 결과에서 제목과 링크를 가져와서 출력
-    for item in soup.select('.type01 .title a'):
-        title = item.get_text()
-        link = item['href']
-        await ctx.send(f'{title}\n{link}')
 
 #Run the bot
 bot.run(TOKEN)
+    
+
