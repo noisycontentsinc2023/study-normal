@@ -37,7 +37,6 @@ flag_emoji_dict = {
 "🇰🇷": "ko",
 }
 
-#For a more secure, we loaded the .env file and assign the token value to a variable 
 TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
