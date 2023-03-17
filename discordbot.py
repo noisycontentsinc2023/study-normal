@@ -153,7 +153,7 @@ async def event(ctx):
 
 
         embed = discord.Embed(title="현재 진행중인 이벤트", description="자세한 정보는 홈페이지를 참고해주세요 http://studymini.com/", color=0x62c1cc)
-        embed.add_field(name="이벤트 1", value=f"{vent1}\n\u200c{vent11}\n[자세히 보기]({vent11_url})", inline=True)
+        embed.add_field(name="이벤트 1", value=f"{vent1}\n\u200c{vent11}\n [자세히 보기]({vent11_url})", inline=True)
         embed.add_field(name="이벤트 2", value=f"{vent2}\n\u200c{vent21}\n [자세히 보기]({vent21_url})", inline=True)
         embed.add_field(name="이벤트 3", value=f"{vent3}\n\u200c{vent31}\n [자세히 보기]({vent31_url})", inline=True)
 
