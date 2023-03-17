@@ -69,9 +69,9 @@ async def on_reaction_add(reaction, user):
 async def on_message(message):
     if message.content.startswith("!로또"):
         Text = ""
-        number = [1, 2, 3, 4, 5, 6, 7] # 배열크기 선언해줌
+        number = [1, 2, 3, 4, 5, 6] # 배열크기 선언해줌
         count = 0
-        for i in range(0, 7):
+        for i in range(0, 6):
             num = random.randrange(1, 46)
             number[i] = num
             if count >= 1:
