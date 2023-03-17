@@ -126,8 +126,7 @@ async def on_message(message):
             Text = Text + " " + learn[i]
         encText = Text
 
-        chromedriver_dir = r'C:\selum\chromedriver_win32\chromedriver.exe' #크롬드라이버 경로
-        driver = webdriver.Chrome(chromedriver_dir)
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
         driver.get('https://www.youtube.com/results?search_query='+encText) #유튜브 검색링크
         source = driver.page_source
         bs = bs4.BeautifulSoup(source, 'lxml')
