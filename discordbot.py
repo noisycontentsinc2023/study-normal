@@ -2,14 +2,15 @@ import discord
 from discord.ext import tasks, commands
 from discord.utils import get
 from dotenv import load_dotenv
+from googlesearch import search
 import asyncio
 import os
 import random
 import googletrans 
 from discord import Embed
-import requests
 from bs4 import BeautifulSoup
-  
+
+
 translator = googletrans.Translator()
 intents = discord.Intents.default()
 intents.members = True
@@ -107,6 +108,11 @@ async def lotto(ctx):
     await ctx.send(embed=embed)
         
 #------------------------------------------------검색------------------------------------------------------# 
+
+@bot.command(name='검색')
+async def googlesearch(ctx,search_msg):
+  for URL in search(search_msg,stop=10):
+      await ctx.send(url)
 
 #Run the bot
 bot.run(TOKEN)
