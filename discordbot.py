@@ -3,7 +3,6 @@ from discord.ext import tasks
 from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
-from googlesearch import search
 import asyncio
 import os
 import random
