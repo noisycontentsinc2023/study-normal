@@ -139,9 +139,9 @@ async def event(ctx):
         bs=BeautifulSoup(url_open,'html.parser')
 
         #이벤트 이미지 가져오기
-        value = bs.find("div", attrs={"class":"elementor-widget-container"}).find("img").get('src')
+        value = bs.select('div>h2>a')[0]
 
-        embed = discord.Embed(title="현재 진행 이벤트", description="image", color=0x62c1cc)
+        embed = discord.Embed(title="현재 진행 이벤트", description="value", color=0x62c1cc)
             
         await ctx.send(embed=embed)
 
