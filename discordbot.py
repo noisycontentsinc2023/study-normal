@@ -108,7 +108,7 @@ async def lotto(ctx):
         
 #------------------------------------------------검색------------------------------------------------------# 
 
-@client.event
+@bot.event
 async def on_message(ctx):
     if ctx.author == client.user:
         return
