@@ -8,9 +8,14 @@ import random
 import googletrans 
 from discord import Embed
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
-chromedriver_dir=r'C:\Program Files\Google\Chrome\Application\chromedriver'
-driver=webdriver.Chrome(chromedriver_dir)
+
+def set_chrome_driver():
+    chrome_options = webdriver.ChromeOptions()
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    return driver
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
