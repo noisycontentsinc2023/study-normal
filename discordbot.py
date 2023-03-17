@@ -9,7 +9,7 @@ import googletrans
 from discord import Embed
 from selenium import webdriver
 
-chromedriver_dir=r'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\chrome\chromedriver.exe'
+chromedriver_dir=r'C:\Program Files\Google\Chrome\Application\chromedriver'
 driver=webdriver.Chrome(chromedriver_dir)
 
 translator = googletrans.Translator()
