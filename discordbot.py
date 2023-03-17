@@ -1,14 +1,17 @@
 import discord
-from discord.ext import tasks, commands
+from discord.ext import tasks
+from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
+from googlesearch import search
 import asyncio
 import os
 import random
 import googletrans 
 import requests
-from bs4 import BeautifulSoup
 from discord import Embed
+from bs4 import BeautifulSoup
+
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
@@ -107,6 +110,7 @@ async def lotto(ctx):
     await ctx.send(embed=embed)
         
 #------------------------------------------------검색------------------------------------------------------# 
+
 @bot.command(name='검색')
 async def search(ctx, *, query):
     # 검색어를 인코딩
@@ -127,5 +131,3 @@ async def search(ctx, *, query):
 
 #Run the bot
 bot.run(TOKEN)
-    
-
