@@ -2,14 +2,11 @@ import discord
 from discord.ext import tasks, commands
 from discord.utils import get
 from dotenv import load_dotenv
-from googlesearch import search
 import asyncio
 import os
 import random
 import googletrans 
 from discord import Embed
-from bs4 import BeautifulSoup
-
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
