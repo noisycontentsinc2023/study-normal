@@ -8,6 +8,7 @@ import os
 import random
 import googletrans 
 import requests
+from bs4 import BeautifulSoup
 from discord import Embed
 
 translator = googletrans.Translator()
@@ -124,6 +125,24 @@ async def dice(ctx):
     if randomNum ==6:
         await ctx.send(embed=discord.Embed(description=':game_die: ' + ':six: '))
 
+#------------------------------------------------이벤트------------------------------------------------------# 
+@bot.command(name='이벤트')
+async def event(ctx):
+    # 이벤트 페이지 URL
+    url = 'https://studymini.com/event/'
+    
+    # 이벤트 페이지를 가져와서 BeautifulSoup 객체 생성
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # 이벤트 정보를 가져와서 출력
+    event_list = soup.select('.eventListWrap .eventList li')
+    for event in event_list:
+        event_title = event.select_one('.eventTitle a').get_text().strip()
+        event_period = event.select_one('.eventPeriod strong').get_text().strip()
+        event_link = event.select_one('.eventLink a')['href']
+        embed = discord.Embed(title=event_title, description=event_period, url=event_link)
+        await ctx.send(embed=embed)
 
 #Run the bot
 bot.run(TOKEN)
