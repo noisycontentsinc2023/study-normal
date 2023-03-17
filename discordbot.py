@@ -67,7 +67,7 @@ async def on_reaction_add(reaction, user):
 #------------------------------------------------검색------------------------------------------------------#
 @bot.command()
 async def 로또(ctx):
-    if message.content.startswith("!로또"):
+    if ctx.startswith("!로또"):
         Text = ""
         number = [1, 2, 3, 4, 5, 6] # 배열크기 선언해줌
         count = 0
