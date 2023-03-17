@@ -108,20 +108,6 @@ async def lotto(ctx):
         
 #------------------------------------------------검색------------------------------------------------------# 
 
-@bot.event
-async def on_message(ctx):
-    if ctx.content.startswith('!유튜브'):
-        query = ctx.content[5:]
-
-        # 검색어를 사용하여 유튜브 검색 결과 페이지를 가져옴
-        response = requests.get(f'https://www.youtube.com/results?search_query={query}')
-        soup = BeautifulSoup(response.text, 'html.parser')
-
-        # 검색 결과에서 가장 상위에 있는 동영상의 URL을 가져옴
-        video_url = 'https://www.youtube.com' + soup.find('a', {'class': 'yt-uix-tile-link'})['href']
-
-        await ctx.channel.send(f'검색 결과: {video_url}')
-
 #Run the bot
 bot.run(TOKEN)
     
