@@ -141,12 +141,15 @@ async def event(ctx):
         #이벤트 이미지 가져오기
         vent1 = bs.select('div>h2>a')[0].get_text()
         vent11 = bs.select('div>h2>a')[1].get_text()
-        vent2 = bs.select('div>h2>a')[1].get_text()
-        vent21 = bs.select('div>h2>a')[1].get_text()
+        vent2 = bs.select('div>h2>a')[3].get_text()
+        vent21 = bs.select('div>h2>a')[4].get_text()
+        vent3 = bs.select('div>h2>a')[6].get_text()
+        vent31 = bs.select('div>h2>a')[7].get_text()
 
         embed = discord.Embed(title="현재 진행중인 이벤트", description="자세한 정보는 홈페이지를 참고해주세요 http://studymini.com/", color=0x62c1cc)
         embed.add_field(name="이벤트 1", value=f"{vent1}, {vent11}\n")
         embed.add_field(name="이벤트 2", value=f"{vent2}, {vent21}\n")
+        embed.add_field(name="이벤트 3", value=f"{vent3}, {vent31}\n")
             
         await ctx.send(embed=embed)
 
