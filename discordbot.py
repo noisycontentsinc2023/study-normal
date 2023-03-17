@@ -107,8 +107,8 @@ async def lotto(ctx):
         
 #------------------------------------------------검색------------------------------------------------------# 
 
-@bot.command()
-async def 유튜브(ctx, *, search_query):
+@bot.command(name='유튜브')
+async def youtube(ctx, *, search_query):
     Text = search_query
     encText = Text
 
