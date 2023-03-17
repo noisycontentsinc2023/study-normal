@@ -7,14 +7,6 @@ import os
 import random
 import googletrans 
 from discord import Embed
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
-def set_chrome_driver():
-    chrome_options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-    return driver
   
 translator = googletrans.Translator()
 intents = discord.Intents.default()
@@ -114,36 +106,22 @@ async def lotto(ctx):
         
 #------------------------------------------------검색------------------------------------------------------# 
 
-@bot.command(name='유튜브')
-async def youtube(ctx, *, query: str):
-    options = webdriver.ChromeOptions()
-    options.add_argument('headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    chrome_options = options
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+@client.event
+async def on_message(ctx):
+    if ctx.author == client.user:
+        return
+    
+    if ctx.content.startswith('!유튜브'):
+        query = ctx.content[5:]
 
-    query_string = urllib.parse.urlencode({'search_query': query})
-    driver.get('https://www.youtube.com/results?' + query_string)
+        # 검색어를 사용하여 유튜브 검색 결과 페이지를 가져옴
+        response = requests.get(f'https://www.youtube.com/results?search_query={query}')
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-    source = driver.page_source
-    bs = bs4.BeautifulSoup(source, 'lxml')
-    entire = bs.find_all('a', {'id': 'video-title'})
+        # 검색 결과에서 가장 상위에 있는 동영상의 URL을 가져옴
+        video_url = 'https://www.youtube.com' + soup.find('a', {'class': 'yt-uix-tile-link'})['href']
 
-    embed = discord.Embed(
-        title="검색한 영상 결과",
-        description=f"'{query}'에 대한 검색 결과입니다.",
-        colour=discord.Color.blue()
-    )
-
-    for i in range(0, 4):
-        entireNum = entire[i]
-        entireText = entireNum.text.strip()
-        test1 = entireNum.get('href')
-        rink = 'https://www.youtube.com'+test1
-        embed.add_field(name=f'{i+1}번째 영상', value=f'{entireText}\n링크 : {rink}', inline=False)
-    await ctx.send(embed=embed)
+        await ctx.channel.send(f'검색 결과: {video_url}')
 
 #Run the bot
 bot.run(TOKEN)
