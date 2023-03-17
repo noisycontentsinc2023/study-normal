@@ -69,6 +69,7 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 #------------------------------------------------검색------------------------------------------------------#
+
 @bot.command(name='로또')
 async def lotto(ctx):
     Text = ""
@@ -110,6 +111,7 @@ async def lotto(ctx):
     await ctx.send(embed=embed)
         
 #------------------------------------------------검색------------------------------------------------------# 
+
 @bot.command(name='주사위')
 async def dice(ctx):
     randomNum = random.randrange(1, 7) # 1~6까지 랜덤수
@@ -128,6 +130,7 @@ async def dice(ctx):
         await ctx.send(embed=discord.Embed(description=':game_die: ' + ':six: '))
 
 #------------------------------------------------이벤트------------------------------------------------------# 
+
 @bot.command(name='이벤트')
 async def event(ctx):
         hdr={'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
@@ -151,6 +154,8 @@ async def event(ctx):
         embed.add_field(name="이벤트 3", value=f"{vent3}, {vent31}\n")
             
         await ctx.send(embed=embed)
+
+#------------------------------------------------클라스------------------------------------------------------# 
 
 #Run the bot
 bot.run(TOKEN)
