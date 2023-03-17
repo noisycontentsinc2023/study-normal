@@ -145,8 +145,8 @@ async def event(ctx):
         vent21 = bs.select('div>h2>a')[1].get_text()
 
         embed = discord.Embed(title="현재 진행중인 이벤트", description="자세한 정보는 홈페이지를 참고해주세요 http://studymini.com/", color=0x62c1cc)
-        embed.add_field(name="",value=f"{vent1}, {vent11}")
-        embed.add_field(name="",value=f"{vent1}, {vent11}")
+        embed.add_field(name="이벤트 1", value=f"{vent1}, {vent11}\n")
+        embed.add_field(name="이벤트 2", value=f"{vent2}, {vent21}\n")
             
         await ctx.send(embed=embed)
 
