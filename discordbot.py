@@ -8,6 +8,7 @@ import os
 import random
 import googletrans 
 import requests
+from bs4 import BeautifulSoup
 from discord import Embed
 
 translator = googletrans.Translator()
@@ -133,7 +134,7 @@ async def event(ctx):
         res = requests.get(url).text
         soup = BeautifulSoup(res, "html.parser")
 
-        // 이벤트 이미지 가져오기
+        #이벤트 이미지 가져오기
         img = soup.find("div", attrs={"class":"elementor-widget-container"}).find("img").get('src')
 
         embed = discord.Embed(title="현재 진행 이벤트", description="", color=0x62c1cc)
@@ -143,3 +144,5 @@ async def event(ctx):
 
 #Run the bot
 bot.run(TOKEN)
+    
+
