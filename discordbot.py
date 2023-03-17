@@ -7,6 +7,9 @@ import os
 import random
 import googletrans 
 from discord import Embed
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 translator = googletrans.Translator()
@@ -108,30 +111,37 @@ async def lotto(ctx):
 #------------------------------------------------검색------------------------------------------------------# 
 
 @bot.command(name='유튜브')
-async def youtube(ctx, *, search_query):
-    Text = search_query
-    encText = Text
-
+async def youtube(ctx, *, query: str):
+    options = webdriver.ChromeOptions()
+    options.add_argument('headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    chrome_options = options
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-    driver.get('https://www.youtube.com/results?search_query='+encText) #유튜브 검색링크
+
+    query_string = urllib.parse.urlencode({'search_query': query})
+    driver.get('https://www.youtube.com/results?' + query_string)
+
     source = driver.page_source
     bs = bs4.BeautifulSoup(source, 'lxml')
-    entire = bs.find_all('a', {'id': 'video-title'}) # a태그에서 video title 이라는 id를 찾음
+    entire = bs.find_all('a', {'id': 'video-title'})
 
     embed = discord.Embed(
-        title="영상들!",
-        description="검색한 영상 결과",
-        colour=discord.Color.blue())
+        title="검색한 영상 결과",
+        description=f"'{query}'에 대한 검색 결과입니다.",
+        colour=discord.Color.blue()
+    )
 
     for i in range(0, 4):
         entireNum = entire[i]
-        entireText = entireNum.text.strip()  # 영상제목
-        print(entireText)
-        test1 = entireNum.get('href')  # 하이퍼링크
-        print(test1)
+        entireText = entireNum.text.strip()
+        test1 = entireNum.get('href')
         rink = 'https://www.youtube.com'+test1
-        embed.add_field(name=str(i+1)+'번째 영상',value=entireText + '\n링크 : '+rink)
+        embed.add_field(name=f'{i+1}번째 영상', value=f'{entireText}\n링크 : {rink}', inline=False)
     await ctx.send(embed=embed)
-    
+
 #Run the bot
 bot.run(TOKEN)
+    
+
