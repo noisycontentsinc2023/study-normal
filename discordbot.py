@@ -110,9 +110,6 @@ async def lotto(ctx):
 
 @bot.event
 async def on_message(ctx):
-    if ctx.author == client.user:
-        return
-    
     if ctx.content.startswith('!유튜브'):
         query = ctx.content[5:]
 
