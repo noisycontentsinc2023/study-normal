@@ -6,6 +6,8 @@ import asyncio
 import os
 import random
 import googletrans 
+import requests
+from bs4 import BeautifulSoup
 from discord import Embed
 
 translator = googletrans.Translator()
@@ -105,11 +107,23 @@ async def lotto(ctx):
     await ctx.send(embed=embed)
         
 #------------------------------------------------검색------------------------------------------------------# 
-
 @bot.command(name='검색')
-async def googlesearch(ctx,search_msg):
-  for URL in search(search_msg,stop=10):
-      await ctx.send(url)
+async def search(ctx, *, query):
+    # 검색어를 인코딩
+    query_encoded = requests.utils.quote(query)
+    
+    # 검색 결과 페이지 URL
+    search_url = f'https://search.naver.com/search.naver?query={query_encoded}'
+    
+    # 검색 결과 페이지를 가져와서 BeautifulSoup 객체 생성
+    response = requests.get(search_url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # 검색 결과에서 제목과 링크를 가져와서 출력
+    for item in soup.select('.type01 .title a'):
+        title = item.get_text()
+        link = item['href']
+        await ctx.send(f'{title}\n{link}')
 
 #Run the bot
 bot.run(TOKEN)
