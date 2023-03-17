@@ -65,8 +65,8 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
 #------------------------------------------------검색------------------------------------------------------#
-@bot.event
-async def on_message(message):
+@bot.command()
+async def 로또(ctx):
     if message.content.startswith("!로또"):
         Text = ""
         number = [1, 2, 3, 4, 5, 6] # 배열크기 선언해줌
@@ -104,7 +104,7 @@ async def on_message(message):
             description=Text.strip(),
             colour=discord.Color.red()
         )
-        await message.channel.send(embed=embed)
+        await ctx.send(embed=embed)
         
 #------------------------------------------------검색------------------------------------------------------# 
 
