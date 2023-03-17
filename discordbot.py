@@ -7,6 +7,8 @@ import os
 import random
 import googletrans 
 from discord import Embed
+import requests
+from bs4 import BeautifulSoup
   
 translator = googletrans.Translator()
 intents = discord.Intents.default()
