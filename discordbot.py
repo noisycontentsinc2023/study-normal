@@ -109,21 +109,20 @@ async def lotto(ctx):
 #------------------------------------------------검색------------------------------------------------------# 
 @bot.command(name='주사위')
 async def dice(ctx):
-    if message.content.startswith('!주사위'):
-        randomNum = random.randrange(1, 7) # 1~6까지 랜덤수
-        print(randomNum)
-        if randomNum == 1:
-            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: '+ ':one:'))
-        if randomNum == 2:
-            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':two:'))
-        if randomNum ==3:
-            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':three:'))
-        if randomNum ==4:
-            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':four:'))
-        if randomNum ==5:
-            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':five:'))
-        if randomNum ==6:
-            await client.send_message(message.channel, embed=discord.Embed(description=':game_die: ' + ':six: '))
+    randomNum = random.randrange(1, 7) # 1~6까지 랜덤수
+    print(randomNum)
+    if randomNum == 1:
+        await ctx.send(embed=discord.Embed(description=':game_die: '+ ':one:'))
+    if randomNum == 2:
+        await ctx.send(embed=discord.Embed(description=':game_die: ' + ':two:'))
+    if randomNum ==3:
+        await ctx.send(embed=discord.Embed(description=':game_die: ' + ':three:'))
+    if randomNum ==4:
+        await ctx.send(embed=discord.Embed(description=':game_die: ' + ':four:'))
+    if randomNum ==5:
+        await ctx.send(embed=discord.Embed(description=':game_die: ' + ':five:'))
+    if randomNum ==6:
+        await ctx.send(embed=discord.Embed(description=':game_die: ' + ':six: '))
 
 
 #Run the bot
