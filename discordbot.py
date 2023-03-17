@@ -107,6 +107,31 @@ async def lotto(ctx):
         
 #------------------------------------------------검색------------------------------------------------------# 
 
+@bot.command()
+async def 유튜브(ctx, *, search_query):
+    Text = search_query
+    encText = Text
 
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    driver.get('https://www.youtube.com/results?search_query='+encText) #유튜브 검색링크
+    source = driver.page_source
+    bs = bs4.BeautifulSoup(source, 'lxml')
+    entire = bs.find_all('a', {'id': 'video-title'}) # a태그에서 video title 이라는 id를 찾음
+
+    embed = discord.Embed(
+        title="영상들!",
+        description="검색한 영상 결과",
+        colour=discord.Color.blue())
+
+    for i in range(0, 4):
+        entireNum = entire[i]
+        entireText = entireNum.text.strip()  # 영상제목
+        print(entireText)
+        test1 = entireNum.get('href')  # 하이퍼링크
+        print(test1)
+        rink = 'https://www.youtube.com'+test1
+        embed.add_field(name=str(i+1)+'번째 영상',value=entireText + '\n링크 : '+rink)
+    await ctx.send(embed=embed)
+    
 #Run the bot
 bot.run(TOKEN)
