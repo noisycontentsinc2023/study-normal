@@ -191,7 +191,7 @@ async def search(ctx, *args):
     else:
       await ctx.send(f"No results found for \"{query}\".")
   else:
-    await ctx.send('An error occurred while retrieving search results.')
+    await ctx.send('오류가 발생했어요! 명령어를 깜빡하신건 아닐까요?')
 
 #Run the bot
 bot.run(TOKEN)
