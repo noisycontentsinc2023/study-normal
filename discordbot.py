@@ -178,21 +178,27 @@ async def search(ctx, *args):
     'X-Naver-Client-Id': 'iuWr9aAAyKxNnRsRSQIt' ,
     'X-Naver-Client-Secret': 'bkfPugeyIa'
   }
-
   response = requests.get(search_url, headers=headers)
 
   if response.status_code == 200:
     data = response.json()
 
     if len(data['items']) > 0:
-      results = '\n\n'.join([f"{result['title']}\n{result['link']}" for result in data['items']])
-      embed = discord.Embed(title=f"Search Results for \"{query}\"", description=results, color=0x0099ff)
+      # Extract the top 3 search results
+      results = data['items'][:3]
+
+      # Format the results as an embedded message
+      embed = discord.Embed(title=f"Search Results for \"{query}\"", color=0x0099ff)
+
+      for result in results:
+        embed.add_field(name=result['title'], value=result['link'], inline=False)
+
       await ctx.send(embed=embed)
     else:
-      await ctx.send(f"No results found for \"{query}\".")
+      await ctx.send(f"검색결과가 없습니다 \"{query}\".")
   else:
-    await ctx.send('오류가 발생했어요! 명령어를 깜빡하신건 아닐까요?')
-
+    await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
+    
 #Run the bot
 bot.run(TOKEN)
     
