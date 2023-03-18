@@ -174,8 +174,8 @@ async def search(ctx, *args):
   search_url = f'https://openapi.naver.com/v1/search/webkr.json?query={query}'
 
   headers = {
-    'X-Naver-Client-Id': iuWr9aAAyKxNnRsRSQIt,
-    'X-Naver-Client-Secret': bkfPugeyIa
+    'X-Naver-Client-Id': 'iuWr9aAAyKxNnRsRSQIt' ,
+    'X-Naver-Client-Secret': 'bkfPugeyIa'
   }
 
   response = requests.get(search_url, headers=headers)
