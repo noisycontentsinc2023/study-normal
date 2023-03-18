@@ -16,6 +16,9 @@ translator = googletrans.Translator()
 intents = discord.Intents.default()
 intents.members = True
 
+naver_client_id = 'iuWr9aAAyKxNnRsRSQIt'
+naver_client_secret = 'bkfPugeyIa'
+
 # Create a dictionary of flag emojis and their corresponding language codes
 flag_emoji_dict = {
 "🇺🇸": "en",
@@ -68,7 +71,7 @@ async def on_reaction_add(reaction, user):
        # await reaction.message.channel.send(content=f'{reaction.user.mention}',embed=embed)
         await reaction.message.channel.send(content=f'{user.mention}',embed=embed)
 
-#------------------------------------------------검색------------------------------------------------------#
+#------------------------------------------------로또------------------------------------------------------#
 
 @bot.command(name='로또')
 async def lotto(ctx):
@@ -164,6 +167,30 @@ async def event(ctx):
         await ctx.send(embed=embed)
 
 #------------------------------------------------클라스------------------------------------------------------# 
+#------------------------------------------------검색------------------------------------------------------#
+@bot.command(name'!검색')
+async def search(ctx, *args):
+  query = ' '.join(args)
+  search_url = f'https://openapi.naver.com/v1/search/webkr.json?query={query}'
+
+  headers = {
+    'X-Naver-Client-Id': iuWr9aAAyKxNnRsRSQIt,
+    'X-Naver-Client-Secret': bkfPugeyIa
+  }
+
+  response = requests.get(search_url, headers=headers)
+
+  if response.status_code == 200:
+    data = response.json()
+
+    if len(data['items']) > 0:
+      results = '\n\n'.join([f"{result['title']}\n{result['link']}" for result in data['items']])
+      embed = discord.Embed(title=f"Search Results for \"{query}\"", description=results, color=0x0099ff)
+      await ctx.send(embed=embed)
+    else:
+      await ctx.send(f"No results found for \"{query}\".")
+  else:
+    await ctx.send('An error occurred while retrieving search results.')
 
 #Run the bot
 bot.run(TOKEN)
