@@ -168,7 +168,7 @@ async def event(ctx):
 
 #------------------------------------------------클라스------------------------------------------------------# 
 #------------------------------------------------검색------------------------------------------------------#
-@bot.command(name'!검색')
+@bot.command(name'검색')
 async def search(ctx, *args):
   query = ' '.join(args)
   search_url = f'https://openapi.naver.com/v1/search/webkr.json?query={query}'
