@@ -7,6 +7,8 @@ import random
 import googletrans 
 import requests
 import re
+import time
+import datetime
 
 from bs4 import BeautifulSoup
 from discord import Embed
