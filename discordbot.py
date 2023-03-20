@@ -262,29 +262,12 @@ class Poll:
         return ""
 
 
-class EasyPoll(commands.Bot):
+@bot.command(name='투표')
 
     def __init__(self):
-        super().__init__(command_prefix='!')
         self.polls = {}
 
     @staticmethod
-    def help() -> discord.Embed:
-        description = """!투표 "Question"
-        Or
-        !투표 "Question" "Choice A" "Choice B" "Choice C"
-        """
-        embed = discord.Embed(
-            title="Usage:", description=description, color=discord.Color.dark_red()
-        )
-        embed.set_footer(text="HEPIA powered")
-        return embed
-
-    async def on_ready(self) -> None:
-        print(f"{self.user} has connected to Discord!")
-        activity = discord.Game("!투표")
-        await self.change_presence(activity=activity)
-
     async def send_reactions(self, message: discord.Message) -> None:
         """Add the reactions to the just sent poll embed message"""
         poll = self.polls.get(message.id)
