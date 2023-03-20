@@ -279,7 +279,7 @@ class Poll:
         self.polls[nonce] = poll
         await ctx.message.delete()
         message = await ctx.send(poll.get_message(), embed=poll.get_embed())
-        await self.send_reactions(message)
+        await self.send_reactions(message=message)
         
 #Run the bot
 bot.run(TOKEN)
