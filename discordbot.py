@@ -204,83 +204,59 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-REGEX = re.compile(r'"(.*?)"')
+class QuickPoll(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
+    @commands.command(pass_context=True)
+    async def poll(self, ctx, question, *options: str):
+        if len(options) <= 1:
+            await ctx.send('You need more than one option to make a poll!')
+            return
+        if len(options) > 10:
+            await ctx.send('You cannot make a poll for more than 10 things!')
+            return
 
-class PollException(Exception):
-    pass
-
-
-@dataclass
-class Poll:
-    question: str
-    choices: List[str]
-
-    @classmethod
-    def from_str(cls, poll_str: str) -> "Poll":
-        quotes_count = poll_str.count('"')
-        if quotes_count == 0 or quotes_count % 2 != 0:
-            raise PollException("Poll must have an even number of double quotes")
-
-        fields = re.findall(REGEX, poll_str)
-        return cls(fields[0], fields[1:] if len(fields) > 0 else [])
-
-    def get_message(self):
-        """Get the poll question with emoji"""
-        return "📊 " + self.question
-
-    def get_embed(self) -> Optional[discord.Embed]:
-        """Construct the nice and good looking discord Embed object that represent the poll choices
-        returns None if there is no choice for this question (yes/no answer)
-        The reason we put answer choices in the embed but not the question: embed can not display @mentions
-        """
-        if not self.choices:
-            return None
-        description = "\n".join(
-            self.get_regional_indicator_symbol(idx) + " " + choice
-            for idx, choice in enumerate(self.choices)
-        )
-        embed = discord.Embed(
-            description=description, color=discord.Color.dark_red()
-        )
-        return embed
-
-    def reactions(self) -> List[str]:
-        """Add as many reaction as the Poll choices needs"""
-        if self.choices:
-            return [
-                self.get_regional_indicator_symbol(i) for i in range(len(self.choices))
-            ]
+        if len(options) == 2 and options[0] == 'yes' and options[1] == 'no':
+            reactions = ['✅', '❌']
         else:
-            return ["👍", "👎"]
+            reactions = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 
-    @staticmethod
-    def get_regional_indicator_symbol(idx: int) -> str:
-        """idx=0 -> A, idx=1 -> B, ... idx=25 -> Z"""
-        if 0 <= idx < 26:
-            return chr(ord("\U0001F1E6") + idx)
-        return ""
+        description = []
+        for x, option in enumerate(options):
+            description += '\n {} {}'.format(reactions[x], option)
+        embed = discord.Embed(title=question, description=''.join(description))
+        react_message = await ctx.send(embed=embed)
+        for reaction in reactions[:len(options)]:
+            await react_message.add_reaction(reaction)
+        embed.set_footer(text='Poll ID: {}'.format(react_message.id))
+        await react_message.edit(embed=embed)
+
+    @commands.command(pass_context=True)
+    async def tally(self, ctx, id=None):
+        poll_message = await ctx.channel.fetch_message(id)
+        embed = poll_message.embeds[0]
+        unformatted_options = [x.strip() for x in embed.description.split('\n')]
+        print(f'unformatted{unformatted_options}')
+        opt_dict = {x[:2]: x[3:] for x in unformatted_options} if unformatted_options[0][0] == '1' \
+            else {x[:1]: x[2:] for x in unformatted_options}
+        # check if we're using numbers for the poll, or x/checkmark, parse accordingly
+        voters = [self.bot.user.id]  # add the bot's ID to the list of voters to exclude it's votes
+
+        tally = {x: 0 for x in opt_dict.keys()}
+        for reaction in poll_message.reactions:
+            if reaction.emoji in opt_dict.keys():
+                reactors = await reaction.users().flatten()
+                for reactor in reactors:
+                    if reactor.id not in voters:
+                        tally[reaction.emoji] += 1
+                        voters.append(reactor.id)
+        output = f"Results of the poll for '{embed.title}':\n" + '\n'.join(['{}: {}'.format(opt_dict[key], tally[key]) for key in tally.keys()])
+        await ctx.send(output)
 
 
-    @bot.command(name='투표')
-    async def send_reactions(self, message: discord.Message) -> None:
-        """Add the reactions to the just sent poll embed message"""
-        poll = self.polls.get(message.id)
-        if poll:
-            for reaction in poll.reactions():
-                await message.add_reaction(reaction, message)
-            self.polls.pop(message.id)
-
-    @commands.command(name="투표")
-    async def send_poll(self, ctx: commands.Context) -> None:
-        """Send the embed poll to the channel"""
-        poll = Poll.from_str(ctx.message.content)
-        nonce = random.randint(0, 1e9)
-        self.polls[nonce] = poll
-        await ctx.message.delete()
-        message = await ctx.send(poll.get_message(), embed=poll.get_embed())
-        await self.send_reactions(message=message)
-        
+def setup(bot):
+    bot.add_cog(QuickPoll(bot))
 #Run the bot
 bot.run(TOKEN)
     
