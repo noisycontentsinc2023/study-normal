@@ -209,7 +209,7 @@ async def search(ctx, *args):
 
 #------------------------------------------------투표------------------------------------------------------#  
 @bot.command()
-async def표투표(ctx, *, args):
+async def 투표(ctx, *, args):
     '''
     vote
     :param args: title and choice separated by commas (",")
