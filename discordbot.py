@@ -246,11 +246,11 @@ async def 투표(ctx, *, args):
                 try:
                     s += f'{next(emoji)} {option}\n'
                 except StopIteration:
-                    await ctx.send('You can only vote up to 9 options.')
+                    await ctx.send('옵션은 9개까지만 가능해')
                     return
 
             # Output title to Discord
-            embed.add_field(name=s, value='1 is present by default, duplicate voting possible')
+            embed.add_field(name=s, value='')
             message = await ctx.send(embed=embed)
 
             # Output options to Discord
