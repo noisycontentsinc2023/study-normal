@@ -270,9 +270,9 @@ class EasyPoll(commands.Bot):
 
     @staticmethod
     def help() -> discord.Embed:
-        description = """/poll "Question"
+        description = """!투표 "Question"
         Or
-        /poll "Question" "Choice A" "Choice B" "Choice C"
+        !투표 "Question" "Choice A" "Choice B" "Choice C"
         """
         embed = discord.Embed(
             title="Usage:", description=description, color=discord.Color.dark_red()
@@ -282,7 +282,7 @@ class EasyPoll(commands.Bot):
 
     async def on_ready(self) -> None:
         print(f"{self.user} has connected to Discord!")
-        activity = discord.Game("/poll")
+        activity = discord.Game("!투표")
         await self.change_presence(activity=activity)
 
     async def send_reactions(self, message: discord.Message) -> None:
@@ -293,11 +293,15 @@ class EasyPoll(commands.Bot):
                 await message.add_reaction(reaction)
             self.polls.pop(message.id)
 
+    @commands.command(name="투표")
     async def send_poll(self, ctx: commands.Context) -> None:
         """Send the embed poll to the channel"""
         poll = Poll.from_str(ctx.message.content)
         nonce = random.randint(0, 1e9)
-        self.polls[nonce]
+        self.polls[nonce] = poll
+        await ctx.message.delete()
+        message = await ctx.send(poll.get_message(), embed=poll.get_embed(), nonce=nonce)
+        await self.send_reactions(message)
         
 #Run the bot
 bot.run(TOKEN)
