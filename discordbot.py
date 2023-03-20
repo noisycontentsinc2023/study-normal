@@ -245,6 +245,7 @@ class Poll:
 @bot.command(name='투표')
 async def start_poll(ctx, question, *options):
     # Create a new poll object and add options
+    options = [option.strip() for option in " ".join(options).split(",")]
     poll = Poll(question, options)
     
     # Send the poll message and add reaction options
@@ -256,22 +257,6 @@ async def start_poll(ctx, question, *options):
     while not poll.is_done():
         await asyncio.sleep(1)
     
-    # Send the final results
-    await ctx.send(poll.results())
-
-async def start_thread_poll(ctx, question, options):
-    # Create a new poll object and add options
-    poll = Poll(question, options)
-
-    # Send the poll message and add reaction options
-    message = await ctx.send(poll.message())
-    for i in range(len(poll.options)):
-        await message.add_reaction(emoji_map[i])
-
-    # Wait for votes to come in
-    while not poll.is_done():
-        await asyncio.sleep(1)
-
     # Send the final results
     await ctx.send(poll.results())
 
