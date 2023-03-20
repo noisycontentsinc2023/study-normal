@@ -219,12 +219,6 @@ class Poll:
 
     @classmethod
     def from_str(cls, poll_str: str) -> "Poll":
-        """Return a Poll object from a string that match this template:
-        '/poll "Question comes first" "then first choice" "second choice" "third choice"'     end so on if needed
-        or simpler question that need binary answer:
-        '/poll "Only the question"
-        Raises PollException if the double quotes count is odd
-        """
         quotes_count = poll_str.count('"')
         if quotes_count == 0 or quotes_count % 2 != 0:
             raise PollException("Poll must have an even number of double quotes")
@@ -270,11 +264,6 @@ class Poll:
 
 
 class EasyPoll(discord.Client):
-    """Simple discord bot that creates poll
-    Each time a poll is send, we store it in a dict with the message nonce as key.
-    When the bot read one of its own message, it checks if the nouce is in the dict
-    If yes, it add the poll reactions emoji to the message
-    """
 
     def __init__(self, **options):
         super().__init__(**options)
@@ -320,7 +309,7 @@ class EasyPoll(discord.Client):
             await self.send_reactions(message)
             return
 
-        if message.content.startswith("/poll"):
+        if message.content.startswith("!투표"):
             try:
                 await self.send_poll(message)
             except PollException:
