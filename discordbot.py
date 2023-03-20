@@ -263,7 +263,7 @@ class Poll:
         return ""
 
 
-class EasyPoll(discord.Client):
+class EasyPoll(discord.Client(intents=intents)):
 
     def __init__(self, **options):
         super().__init__(**options)
