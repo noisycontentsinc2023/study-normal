@@ -263,10 +263,11 @@ class Poll:
         return ""
 
 
-class EasyPoll(discord.Client(intents=intents)):
+class EasyPoll(discord.Client):
 
-    def __init__(self, **options):
-        super().__init__(**options)
+    def __init__(self):
+        intents = discord.Intents.default()
+        super().__init__(intents=intents)
         self.polls: Dict[int, Poll] = {}
 
     @staticmethod
