@@ -9,8 +9,6 @@ import requests
 import re
 import time
 import datetime
-import matplotlib.pyplot as plt
-import numpy as np
 
 from bs4 import BeautifulSoup
 from discord import Embed
@@ -210,16 +208,12 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-vote_counts = {}
-
 @bot.command()
 async def 투표(ctx, *, args):
     '''
     vote
     :param args: title and choice separated by commas (",")
     '''
-    global vote_counts
-    
     # TODO web
     # Disable TODO duplicate voting
     # Create a TODO anonymous vote
@@ -251,9 +245,8 @@ async def 투표(ctx, *, args):
             for option in options:
                 try:
                     s += f'{next(emoji)} {option}\n'
-                    vote_counts[option] = 0  # Initialize vote count for each option to 0
                 except StopIteration:
-                    await ctx.send('옵션은 9개까지만 가능요')
+                    await ctx.send('옵션은 9개까지만 가능해')
                     return
 
             # Output title to Discord
@@ -263,41 +256,6 @@ async def 투표(ctx, *, args):
             # Output options to Discord
             for i in range(len(options)):
                 await message.add_reaction(emoji_list[i])
-
-            # Wait for reactions
-            await asyncio.sleep(60)
-
-            # Get updated message with reactions
-            message = await ctx.channel.fetch_message(message.id)
-
-            # Update vote counts based on reactions
-            for reaction in message.reactions:
-                if reaction.emoji in emoji_list:
-                    index = emoji_list.index(reaction.emoji)
-                    option = options[index]
-                    count = reaction.count - 1  # Subtract 1 to exclude the bot's own reaction
-                    vote_counts[option] += count
-
-            # Create bar chart of vote counts
-            fig, ax = plt.subplots()
-            options = list(vote_counts.keys())
-            counts = list(vote_counts.values())
-            y_pos = np.arange(len(options))
-            ax.barh(y_pos, counts)
-            ax.set_yticks(y_pos)
-            ax.set_yticklabels(options)
-            ax.invert_yaxis()  # Invert y-axis to display options from top to bottom
-            ax.set_xlabel('Vote Count')
-            ax.set_title(title)
-            plt.savefig('vote_counts.png')
-            
-            # Send the bar chart to Discord
-            with open('vote_counts.png', 'rb') as f:
-                image = discord.File(f)
-                await ctx.send(file=image)
-
                 
 #Run the bot
 bot.run(TOKEN)
-    
-
