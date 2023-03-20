@@ -241,9 +241,8 @@ class Poll:
         for i, option in enumerate(self.options):
             message += f'{emoji_map[i]} {option}: {self.votes[i]}\n'
         return message
-      
-@bot.command(name='투표')
-async def start_vote(ctx, question, *options):
+
+async def start_poll(ctx, question, options):
     # Create a new poll object and add options
     poll = Poll(question, options)
     
@@ -258,6 +257,23 @@ async def start_vote(ctx, question, *options):
     
     # Send the final results
     await ctx.send(poll.results())
+
+def run_bot():
+    # Define the Discord client object and connect it to the Discord API using the bot token
+    client = discord.Client()
+    
+    @client.event
+    async def on_ready():
+        print(f'Logged in as {client.user}')
+
+    @client.command()
+    async def start(ctx, question, *options):
+        await start_poll(ctx, question, options)
+
+    client.run(TOKEN)
+    
+    # Keep the event loop running
+    asyncio.get_event_loop().run_forever()
 
 # Create a new thread to run the bot
 bot_thread = threading.Thread(target=run_bot)
