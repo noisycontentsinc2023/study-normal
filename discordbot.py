@@ -265,7 +265,7 @@ class Poll:
 class EasyPoll(commands.Bot):
 
     def __init__(self):
-        super().__init__(command_prefix='/')
+        super().__init__(command_prefix='!')
         self.polls = {}
 
     @staticmethod
