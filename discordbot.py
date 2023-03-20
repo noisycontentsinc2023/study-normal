@@ -268,7 +268,7 @@ class Poll:
         poll = self.polls.get(message.id)
         if poll:
             for reaction in poll.reactions():
-                await message.add_reaction(reaction)
+                await message.add_reaction(reaction, message)
             self.polls.pop(message.id)
 
     @commands.command(name="투표")
