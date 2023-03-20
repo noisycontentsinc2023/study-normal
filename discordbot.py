@@ -15,6 +15,10 @@ from discord.ext import commands
 from discord.utils import get
 from dataclasses import dataclass
 from typing import List, Dict, Optional
+from discord.ext.commands import when_mentioned_or, CommandNotFound, has_permissions, NoPrivateMessage, Bot, \
+    ExpectedClosingQuoteError
+from react_decorators import *
+from voting import voteDB
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
@@ -204,59 +208,52 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-class Poll:
-    def __init__(self, question, options):
-        self.question = question
-        self.options = options
-        self.emojis = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"]
-        self.votes = [0]*len(options)
+@bot.command()
+async def 투표(ctx, title, *choice):
+    '''
+    투표
+    :param title: 투표 제목
+    :param choice: 선택지 (최대 9개)
+    '''
+    # TODO 웹
+    # TODO 중복투표 불가능하게
+    # TODO 익명투표 만들기
+    # 투표 도움말
+    if title is None and choice == ():
+        embed = discord.Embed(title=f'투표 도움말', description=f'개발자: gagip')
+        embed.add_field(name=f'좋아요/싫어요', value=f'!투표 제목')
+        embed.add_field(name=f'복수응답(1-9)', value=f'!투표 제목 내용1 내용2 ...')
+        await ctx.send(embed=embed)
     
-    def add_vote(self, emoji):
-        index = self.emojis.index(emoji)
-        self.votes[index] += 1
-    
-    def get_results(self):
-        results = "Poll Results: " + self.question + "\n"
-        for i, option in enumerate(self.options):
-            results += self.emojis[i] + " - " + option + ": " + str(self.votes[i]) + " votes\n"
-        return results
-    
-class PollBot(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-    
-    @bot.command(name="투표")
-    async def create_poll(self, ctx):
-        def check(m):
-            return m.author == ctx.author and m.channel == ctx.channel
-        
-        await ctx.send("투표 항목을 쉼표로 구분해서 입력해주세요.")
-        msg = await self.bot.wait_for("message", check=check)
-        options = msg.content.split(",")
-        question = options.pop(0)
-        poll = Poll(question, options)
-        
-        embed = discord.Embed(title=poll.question)
-        for i, option in enumerate(poll.options):
-            embed.add_field(name=poll.emojis[i], value=option, inline=False)
-        
-        message = await ctx.send(embed=embed)
-        for emoji in poll.emojis[:len(poll.options)]:
-            await message.add_reaction(emoji)
-            
-        def reaction_check(reaction, user):
-            return user != self.bot.user and str(reaction.emoji) in poll.emojis
-            
-        while True:
-            reaction, user = await self.bot.wait_for("reaction_add", check=reaction_check)
-            poll.add_vote(str(reaction.emoji))
-            embed = discord.Embed(title=poll.question)
-            for i, option in enumerate(poll.options):
-                embed.add_field(name=poll.emojis[i], value=option + " - " + str(poll.votes[i]), inline=False)
-            await message.edit(embed=embed)
-        
-def setup(bot):
-    bot.add_cog(PollBot(bot))
+    # 투표 진행
+    else:
+        embed = discord.Embed(title=title)
+        if choice == ():
+            # 좋아요/싫어요
+            message = await ctx.send(embed=embed)
+            await message.add_reaction('👍')
+            await message.add_reaction('👎')
+        else:
+            # 복수응답(1-10)
+            emoji_list = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']  # 선택지 번호 라벨
+
+            s = ''
+            emoji = iter(emoji_list)
+            for cont in choice:
+                try:
+                    s += f'{next(emoji)} {cont}\n'
+                except ValueError:
+                    await ctx.sent('투표 선택지는 9개까지만 가능합니다.')
+                    return
+
+            # 디스코드에 제목 출력
+            embed.add_field(name=s, value='1은 기본적으로 있음, 중복투표 가능')
+            message = await ctx.send(embed=embed)
+
+            # 디스코드에 선택지 출력
+            for i in range(len(choice)):
+                await message.add_reaction(emoji_list[i])
+                
 #Run the bot
 bot.run(TOKEN)
     
