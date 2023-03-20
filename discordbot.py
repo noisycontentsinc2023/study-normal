@@ -204,59 +204,46 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-class QuickPoll(commands.Cog):
+class Poll(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True, name="투표")
-    async def poll(self, ctx, question, *options: str):
-        if len(options) <= 1:
-            await ctx.send('You need more than one option to make a poll!')
+    @commands.command(name="투표", help="사용 예시: !투표 제목, 옵션1, 옵션2, ...")
+    async def create_poll(self, ctx, *, args):
+        options = args.split(", ")
+        if len(options) < 2:
+            await ctx.send("투표 옵션은 2개 이상이어야 합니다.")
             return
-        if len(options) > 10:
-            await ctx.send('You cannot make a poll for more than 10 things!')
+        elif len(options) > 10:
+            await ctx.send("투표 옵션은 10개 이하이어야 합니다.")
             return
 
-        if len(options) == 2 and options[0] == 'yes' and options[1] == 'no':
-            reactions = ['✅', '❌']
-        else:
-            reactions = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
+        poll_embed = discord.Embed(title=f"📊 {options[0]}")
+        for i, option in enumerate(options[1:]):
+            poll_embed.add_field(name=f"{i+1}. {option}", value="\u200b", inline=False)
 
-        description = []
-        for x, option in enumerate(options):
-            description += '\n {} {}'.format(reactions[x], option)
-        embed = discord.Embed(title=question, description=''.join(description))
-        react_message = await ctx.send(embed=embed)
-        for reaction in reactions[:len(options)]:
-            await react_message.add_reaction(reaction)
-        embed.set_footer(text='Poll ID: {}'.format(react_message.id))
-        await react_message.edit(embed=embed)
+        poll_message = await ctx.send(embed=poll_embed)
 
-    @commands.command(pass_context=True, name="투표결과")
-    async def tally(self, ctx, id=None):
-        poll_message = await ctx.channel.fetch_message(id)
-        embed = poll_message.embeds[0]
-        unformatted_options = [x.strip() for x in embed.description.split('\n')]
-        print(f'unformatted{unformatted_options}')
-        opt_dict = {x[:2]: x[3:] for x in unformatted_options} if unformatted_options[0][0] == '1' \
-            else {x[:1]: x[2:] for x in unformatted_options}
-        # check if we're using numbers for the poll, or x/checkmark, parse accordingly
-        voters = [self.bot.user.id]  # add the bot's ID to the list of voters to exclude it's votes
+        for i in range(1, len(options)):
+            await poll_message.add_reaction(f"{i}\u20e3")
 
-        tally = {x: 0 for x in opt_dict.keys()}
-        for reaction in poll_message.reactions:
-            if reaction.emoji in opt_dict.keys():
-                reactors = await reaction.users().flatten()
-                for reactor in reactors:
-                    if reactor.id not in voters:
-                        tally[reaction.emoji] += 1
-                        voters.append(reactor.id)
-        output = f"Results of the poll for '{embed.title}':\n" + '\n'.join(['{}: {}'.format(opt_dict[key], tally[key]) for key in tally.keys()])
-        await ctx.send(output)
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        message = reaction.message
+        embeds = message.embeds
+        if len(embeds) == 0 or not embeds[0].title.startswith("📊"):
+            return
+        for field in embeds[0].fields:
+            if reaction.emoji == f"{field.name.split('.')[0]}\u20e3":
+                count = int(field.value.split()[0]) + 1
+                field.value = f"{count}명 참여"
+                new_embed = discord.Embed(title=embeds[0].title, color=embeds[0].color)
+                for field in embeds[0].fields:
+                    new_embed.add_field(name=field.name, value=field.value, inline=False)
+                await message.edit(embed=new_embed)
+                break
 
-
-def setup(bot):
-    bot.add_cog(QuickPoll(bot))
+bot.add_cog(Poll(bot))
 #Run the bot
 bot.run(TOKEN)
     
