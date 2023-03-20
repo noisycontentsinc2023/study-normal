@@ -201,7 +201,64 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-@bot.command(name='투표')
+# Define the emoji map for the reaction options
+emoji_map = [
+    '\U0001F1E6',
+    '\U0001F1E7',
+    '\U0001F1E8',
+    '\U0001F1E9',
+    '\U0001F1EA',
+    '\U0001F1EB',
+    '\U0001F1EC',
+    '\U0001F1ED',
+    '\U0001F1EE',
+    '\U0001F1EF'
+]
+
+class Poll:
+    def __init__(self, question, options):
+        self.question = question
+        self.options = options
+        self.votes = [0] * len(options)
+    
+    def vote(self, option):
+        self.votes[option] += 1
+    
+    def is_done(self):
+        # Determine if the vote is done based on some condition
+        return False
+    
+    def message(self):
+        # Create a message string to send to the channel
+        message = f'{self.question}\n'
+        for i, option in enumerate(self.options):
+            message += f'{emoji_map[i]} {option}\n'
+        return message
+    
+    def results(self):
+        # Create a message string with the final vote results
+        message = f'{self.question} Results:\n'
+        for i, option in enumerate(self.options):
+            message += f'{emoji_map[i]} {option}: {self.votes[i]}\n'
+        return message
+
+@bot.command(name='')
+async def start_poll(ctx, question, options):
+    # Create a new poll object and add options
+    poll = Poll(question, options)
+    
+    # Send the poll message and add reaction options
+    message = await ctx.send(poll.message())
+    for i in range(len(poll.options)):
+        await message.add_reaction(emoji_map[i])
+    
+    # Wait for votes to come in
+    while not poll.is_done():
+        await asyncio.sleep(1)
+    
+    # Send the final results
+    await ctx.send(poll.results())
+
 async def start_thread_poll(ctx, question, options):
     # Create a new poll object and add options
     poll = Poll(question, options)
@@ -218,6 +275,32 @@ async def start_thread_poll(ctx, question, options):
     # Send the final results
     await ctx.send(poll.results())
 
+def run_bot():
+    # Define the Discord client object and connect it to the Discord API using the bot token
+    client = discord.Client()
+    
+    @client.event
+    async def on_ready():
+        print(f'Logged in as {client.user}')
+
+    @client.command()
+    async def start(ctx, question, *options):
+        await start_poll(ctx, question, options)
+
+    @client.command()
+    async def start_thread_vote(ctx, question, *options):
+        # Create a new thread to run the poll
+        poll_thread = threading.Thread(target=start_thread_poll, args=(ctx, question, options))
+        poll_thread.start()
+
+    client.run('your-bot-token')
+    
+    # Keep the event loop running
+    asyncio.get_event_loop().run_forever()
+
+# Create a new thread to run the bot
+bot_thread = threading.Thread(target=run_bot)
+bot_thread.start
 #Run the bot
 bot.run(TOKEN)
     
