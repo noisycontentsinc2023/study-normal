@@ -263,11 +263,6 @@ class Poll:
 
 
 @bot.command(name='투표')
-
-    def __init__(self):
-        self.polls = {}
-
-    @staticmethod
     async def send_reactions(self, message: discord.Message) -> None:
         """Add the reactions to the just sent poll embed message"""
         poll = self.polls.get(message.id)
@@ -276,7 +271,7 @@ class Poll:
                 await message.add_reaction(reaction)
             self.polls.pop(message.id)
 
-    @commands.command(name="투표")
+@commands.command(name="투표")
     async def send_poll(self, ctx: commands.Context) -> None:
         """Send the embed poll to the channel"""
         poll = Poll.from_str(ctx.message.content)
