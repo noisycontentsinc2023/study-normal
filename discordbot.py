@@ -243,20 +243,26 @@ class Poll:
         return message
 
 @bot.command(name='투표')
-async def start_poll(ctx, question, *options):
+async def start_poll(ctx, *, question_and_options):
+    # Split question and options by comma
+    question, options_str = question_and_options.split(',', 1)
+
+    # Strip whitespace from question and each option
+    question = question.strip()
+    options = [option.strip() for option in options_str.split(',')]
+
     # Create a new poll object and add options
-    options = [option.strip() for option in " ".join(options).split(",")]
     poll = Poll(question, options)
-    
+
     # Send the poll message and add reaction options
     message = await ctx.send(poll.message())
     for i in range(len(poll.options)):
         await message.add_reaction(emoji_map[i])
-    
+
     # Wait for votes to come in
     while not poll.is_done():
         await asyncio.sleep(1)
-    
+
     # Send the final results
     await ctx.send(poll.results())
 
