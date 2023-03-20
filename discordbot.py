@@ -262,12 +262,11 @@ class Poll:
         return ""
 
 
-class EasyPoll(discord.Client):
+class EasyPoll(commands.Bot):
 
     def __init__(self):
-        intents = discord.Intents.default()
-        super().__init__(intents=intents)
-        self.polls: Dict[int, Poll] = {}
+        super().__init__(command_prefix='/')
+        self.polls = {}
 
     @staticmethod
     def help() -> discord.Embed:
@@ -286,40 +285,20 @@ class EasyPoll(discord.Client):
         activity = discord.Game("/poll")
         await self.change_presence(activity=activity)
 
-    async def send_reactions(self, message: discord.message) -> None:
+    async def send_reactions(self, message: discord.Message) -> None:
         """Add the reactions to the just sent poll embed message"""
-        poll = self.polls.get(message.nonce)
+        poll = self.polls.get(message.id)
         if poll:
             for reaction in poll.reactions():
                 await message.add_reaction(reaction)
-            self.polls.pop(message.nonce)
+            self.polls.pop(message.id)
 
-    async def send_poll(self, message: discord.message) -> None:
+    async def send_poll(self, ctx: commands.Context) -> None:
         """Send the embed poll to the channel"""
-        poll = Poll.from_str(message.content)
+        poll = Poll.from_str(ctx.message.content)
         nonce = random.randint(0, 1e9)
-        self.polls[nonce] = poll
-        await message.delete()
-        await message.channel.send(poll.get_message(), embed=poll.get_embed(), nonce=nonce)
-
-    async def on_message(self, message: discord.message) -> None:
-        """Every time a message is send on the server, it arrives here"""
-
-        if message.author == self.user:
-            await self.send_reactions(message)
-            return
-
-        if message.content.startswith("!투표"):
-            try:
-                await self.send_poll(message)
-            except PollException:
-                await message.channel.send(embed=self.help())
-
-
-if __name__ == "__main__":
-    
-    client = EasyPoll()
-    client.run(TOKEN)
+        self.polls[nonce]
+        
 #Run the bot
 bot.run(TOKEN)
     
