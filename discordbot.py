@@ -273,7 +273,7 @@ class Poll:
 
     @commands.command(name="투표")
     async def send_poll(self, ctx: commands.Context) -> None:
-         """Send the embed poll to the channel"""
+        """Send the embed poll to the channel"""
         poll = Poll.from_str(ctx.message.content)
         nonce = random.randint(0, 1e9)
         self.polls[nonce] = poll
