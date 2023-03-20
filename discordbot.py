@@ -1,17 +1,21 @@
 import discord
-from discord.ext import tasks
-from discord.ext import commands
-from discord.utils import get
 import urllib.request
-from dotenv import load_dotenv
 import asyncio
 import threading
 import os
 import random
 import googletrans 
 import requests
+import re
+
 from bs4 import BeautifulSoup
 from discord import Embed
+from discord.ext import tasks
+from discord.ext import commands
+from discord.utils import get
+from dataclasses import dataclass
+from dotenv import load_dotenv
+from typing import List, Dict, Optional
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
@@ -201,103 +205,134 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-# Define the emoji map for the reaction options
-emoji_map = [
-    '\U0001F1E6',
-    '\U0001F1E7',
-    '\U0001F1E8',
-    '\U0001F1E9',
-    '\U0001F1EA',
-    '\U0001F1EB',
-    '\U0001F1EC',
-    '\U0001F1ED',
-    '\U0001F1EE',
-    '\U0001F1EF'
-]
+REGEX = re.compile(r'"(.*?)"')
 
+
+class PollException(Exception):
+    pass
+
+
+@dataclass
 class Poll:
-    def __init__(self, question, options):
-        self.question = question
-        self.options = options
-        self.votes = [0] * len(options)
-        self.votes_by_emoji = {}  # New member to store votes by emoji
+    question: str
+    choices: List[str]
+
+    @classmethod
+    def from_str(cls, poll_str: str) -> "Poll":
+        """Return a Poll object from a string that match this template:
+        '/poll "Question comes first" "then first choice" "second choice" "third choice"'     end so on if needed
+        or simpler question that need binary answer:
+        '/poll "Only the question"
+        Raises PollException if the double quotes count is odd
+        """
+        quotes_count = poll_str.count('"')
+        if quotes_count == 0 or quotes_count % 2 != 0:
+            raise PollException("Poll must have an even number of double quotes")
+
+        fields = re.findall(REGEX, poll_str)
+        return cls(fields[0], fields[1:] if len(fields) > 0 else [])
+
+    def get_message(self):
+        """Get the poll question with emoji"""
+        return "📊 " + self.question
+
+    def get_embed(self) -> Optional[discord.Embed]:
+        """Construct the nice and good looking discord Embed object that represent the poll choices
+        returns None if there is no choice for this question (yes/no answer)
+        The reason we put answer choices in the embed but not the question: embed can not display @mentions
+        """
+        if not self.choices:
+            return None
+        description = "\n".join(
+            self.get_regional_indicator_symbol(idx) + " " + choice
+            for idx, choice in enumerate(self.choices)
+        )
+        embed = discord.Embed(
+            description=description, color=discord.Color.dark_red()
+        )
+        return embed
+
+    def reactions(self) -> List[str]:
+        """Add as many reaction as the Poll choices needs"""
+        if self.choices:
+            return [
+                self.get_regional_indicator_symbol(i) for i in range(len(self.choices))
+            ]
+        else:
+            return ["👍", "👎"]
+
+    @staticmethod
+    def get_regional_indicator_symbol(idx: int) -> str:
+        """idx=0 -> A, idx=1 -> B, ... idx=25 -> Z"""
+        if 0 <= idx < 26:
+            return chr(ord("\U0001F1E6") + idx)
+        return ""
+
+
+class EasyPoll(discord.Client):
+    """Simple discord bot that creates poll
+    Each time a poll is send, we store it in a dict with the message nonce as key.
+    When the bot read one of its own message, it checks if the nouce is in the dict
+    If yes, it add the poll reactions emoji to the message
+    """
+
+    def __init__(self, **options):
+        super().__init__(**options)
+        self.polls: Dict[int, Poll] = {}
+
+    @staticmethod
+    def help() -> discord.Embed:
+        description = """/poll "Question"
+        Or
+        /poll "Question" "Choice A" "Choice B" "Choice C"
+        """
+        embed = discord.Embed(
+            title="Usage:", description=description, color=discord.Color.dark_red()
+        )
+        embed.set_footer(text="HEPIA powered")
+        return embed
+
+    async def on_ready(self) -> None:
+        print(f"{self.user} has connected to Discord!")
+        activity = discord.Game("/poll")
+        await self.change_presence(activity=activity)
+
+    async def send_reactions(self, message: discord.message) -> None:
+        """Add the reactions to the just sent poll embed message"""
+        poll = self.polls.get(message.nonce)
+        if poll:
+            for reaction in poll.reactions():
+                await message.add_reaction(reaction)
+            self.polls.pop(message.nonce)
+
+    async def send_poll(self, message: discord.message) -> None:
+        """Send the embed poll to the channel"""
+        poll = Poll.from_str(message.content)
+        nonce = random.randint(0, 1e9)
+        self.polls[nonce] = poll
+        await message.delete()
+        await message.channel.send(poll.get_message(), embed=poll.get_embed(), nonce=nonce)
+
+    async def on_message(self, message: discord.message) -> None:
+        """Every time a message is send on the server, it arrives here"""
+
+        if message.author == self.user:
+            await self.send_reactions(message)
+            return
+
+        if message.content.startswith("/poll"):
+            try:
+                await self.send_poll(message)
+            except PollException:
+                await message.channel.send(embed=self.help())
+
+
+if __name__ == "__main__":
     
-    def vote(self, option, user):
-        self.votes[option] += 1
-        emoji = emoji_map[option]
-        if emoji not in self.votes_by_emoji:
-            self.votes_by_emoji[emoji] = set()
-        self.votes_by_emoji[emoji].add(user.id)  # Save user ID for this emoji
-    
-    def is_done(self):
-        # Determine if the vote is done based on some condition
-        return False
-    
-    def message(self):
-        # Create a message string to send to the channel
-        message = f'{self.question}\n'
-        for i, option in enumerate(self.options):
-            message += f'{emoji_map[i]} {option}\n'
-        return message
-    
-    def results(self):
-        # Create a message string with the final vote results
-        message = f'{self.question} Results:\n'
-        for i, option in enumerate(self.options):
-            emoji = emoji_map[i]
-            message += f'{emoji} {option}: {self.votes[i]} ({len(self.votes_by_emoji.get(emoji, []))} votes)\n'
-        return message
-
-@bot.command(name='투표')
-async def start_poll(ctx, *, question_and_options):
-    # Split question and options by comma
-    question, options_str = question_and_options.split(',', 1)
-
-    # Strip whitespace from question and each option
-    question = question.strip()
-    options = [option.strip() for option in options_str.split(',')]
-
-    # Create a new poll object and add options
-    poll = Poll(question, options)
-
-    # Send the poll message and add reaction options
-    message = await ctx.send(poll.message())
-    for i in range(len(poll.options)):
-        await message.add_reaction(emoji_map[i])
-
-    # Wait for votes to come in
-    while not poll.is_done():
-        await asyncio.sleep(1)
-
-    # Send the final results
-    await ctx.send(poll.results())
-
-def run_bot():
-    # Define the Discord client object and connect it to the Discord API using the bot token
-    client = discord.Client()
-    
-    @client.event
-    async def on_ready():
-        print(f'Logged in as {client.user}')
-
-    @client.command()
-    async def start(ctx, question, *options):
-        await start_poll(ctx, question, options)
-
-    @client.command()
-    async def start_thread_vote(ctx, question, *options):
-        # Create a new thread to run the poll
-        poll_thread = threading.Thread(target=start_thread_poll, args=(ctx, question, options))
-        poll_thread.start()
-
-    client.run('your-bot-token')
-    
-    # Keep the event loop running
-    asyncio.get_event_loop().run_forever()
-
-# Create a new thread to run the bot
-bot_thread = threading.Thread(target=run_bot)
-bot_thread.start
+    load_dotenv()
+    token = os.getenv(TOKEN)
+    client = EasyPoll()
+    client.run(token)
 #Run the bot
 bot.run(TOKEN)
     
