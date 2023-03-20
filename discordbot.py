@@ -225,7 +225,7 @@ class PollBot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command(name="투표")
+    @bot.command(name="투표")
     async def create_poll(self, ctx):
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
