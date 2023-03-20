@@ -220,9 +220,14 @@ class Poll:
         self.question = question
         self.options = options
         self.votes = [0] * len(options)
+        self.votes_by_emoji = {}  # New member to store votes by emoji
     
-    def vote(self, option):
+    def vote(self, option, user):
         self.votes[option] += 1
+        emoji = emoji_map[option]
+        if emoji not in self.votes_by_emoji:
+            self.votes_by_emoji[emoji] = set()
+        self.votes_by_emoji[emoji].add(user.id)  # Save user ID for this emoji
     
     def is_done(self):
         # Determine if the vote is done based on some condition
@@ -239,7 +244,8 @@ class Poll:
         # Create a message string with the final vote results
         message = f'{self.question} Results:\n'
         for i, option in enumerate(self.options):
-            message += f'{emoji_map[i]} {option}: {self.votes[i]}\n'
+            emoji = emoji_map[i]
+            message += f'{emoji} {option}: {self.votes[i]} ({len(self.votes_by_emoji.get(emoji, []))} votes)\n'
         return message
 
 @bot.command(name='투표')
