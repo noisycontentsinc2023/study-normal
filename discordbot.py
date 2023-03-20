@@ -208,7 +208,7 @@ class Poll(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="투표", help="사용 예시: !투표 제목, 옵션1, 옵션2, ...")
+    @bot.command(name="투표")
     async def create_poll(self, ctx, *, args):
         options = args.split(", ")
         if len(options) < 2:
