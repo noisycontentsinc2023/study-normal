@@ -208,7 +208,7 @@ class QuickPoll(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, name="투표")
     async def poll(self, ctx, question, *options: str):
         if len(options) <= 1:
             await ctx.send('You need more than one option to make a poll!')
@@ -232,7 +232,7 @@ class QuickPoll(commands.Cog):
         embed.set_footer(text='Poll ID: {}'.format(react_message.id))
         await react_message.edit(embed=embed)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, name="투표")
     async def tally(self, ctx, id=None):
         poll_message = await ctx.channel.fetch_message(id)
         embed = poll_message.embeds[0]
