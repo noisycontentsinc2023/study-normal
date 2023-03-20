@@ -14,7 +14,6 @@ from discord.ext import tasks
 from discord.ext import commands
 from discord.utils import get
 from dataclasses import dataclass
-from dotenv import load_dotenv
 from typing import List, Dict, Optional
 
 translator = googletrans.Translator()
@@ -319,8 +318,6 @@ class EasyPoll(discord.Client):
 
 if __name__ == "__main__":
     
-    load_dotenv()
-    token = os.getenv(TOKEN)
     client = EasyPoll()
     client.run(token)
 #Run the bot
