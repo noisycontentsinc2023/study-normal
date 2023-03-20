@@ -204,46 +204,59 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-class Poll(commands.Cog):
+class Poll:
+    def __init__(self, question, options):
+        self.question = question
+        self.options = options
+        self.emojis = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"]
+        self.votes = [0]*len(options)
+    
+    def add_vote(self, emoji):
+        index = self.emojis.index(emoji)
+        self.votes[index] += 1
+    
+    def get_results(self):
+        results = "Poll Results: " + self.question + "\n"
+        for i, option in enumerate(self.options):
+            results += self.emojis[i] + " - " + option + ": " + str(self.votes[i]) + " votes\n"
+        return results
+    
+class PollBot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @bot.command(name="투표")
-    async def create_poll(self, ctx, *, args):
-        options = args.split(", ")
-        if len(options) < 2:
-            await ctx.send("투표 옵션은 2개 이상이어야 합니다.")
-            return
-        elif len(options) > 10:
-            await ctx.send("투표 옵션은 10개 이하이어야 합니다.")
-            return
-
-        poll_embed = discord.Embed(title=f"📊 {options[0]}")
-        for i, option in enumerate(options[1:]):
-            poll_embed.add_field(name=f"{i+1}. {option}", value="\u200b", inline=False)
-
-        poll_message = await ctx.send(embed=poll_embed)
-
-        for i in range(1, len(options)):
-            await poll_message.add_reaction(f"{i}\u20e3")
-
-    @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
-        message = reaction.message
-        embeds = message.embeds
-        if len(embeds) == 0 or not embeds[0].title.startswith("📊"):
-            return
-        for field in embeds[0].fields:
-            if reaction.emoji == f"{field.name.split('.')[0]}\u20e3":
-                count = int(field.value.split()[0]) + 1
-                field.value = f"{count}명 참여"
-                new_embed = discord.Embed(title=embeds[0].title, color=embeds[0].color)
-                for field in embeds[0].fields:
-                    new_embed.add_field(name=field.name, value=field.value, inline=False)
-                await message.edit(embed=new_embed)
-                break
-
-bot.add_cog(Poll(bot))
+    
+    @commands.command(name="투표")
+    async def create_poll(self, ctx):
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+        
+        await ctx.send("투표 항목을 쉼표로 구분해서 입력해주세요.")
+        msg = await self.bot.wait_for("message", check=check)
+        options = msg.content.split(",")
+        question = options.pop(0)
+        poll = Poll(question, options)
+        
+        embed = discord.Embed(title=poll.question)
+        for i, option in enumerate(poll.options):
+            embed.add_field(name=poll.emojis[i], value=option, inline=False)
+        
+        message = await ctx.send(embed=embed)
+        for emoji in poll.emojis[:len(poll.options)]:
+            await message.add_reaction(emoji)
+            
+        def reaction_check(reaction, user):
+            return user != self.bot.user and str(reaction.emoji) in poll.emojis
+            
+        while True:
+            reaction, user = await self.bot.wait_for("reaction_add", check=reaction_check)
+            poll.add_vote(str(reaction.emoji))
+            embed = discord.Embed(title=poll.question)
+            for i, option in enumerate(poll.options):
+                embed.add_field(name=poll.emojis[i], value=option + " - " + str(poll.votes[i]), inline=False)
+            await message.edit(embed=embed)
+        
+def setup(bot):
+    bot.add_cog(PollBot(bot))
 #Run the bot
 bot.run(TOKEN)
     
