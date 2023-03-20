@@ -259,22 +259,10 @@ async def start_vote(ctx, question, *options):
     # Send the final results
     await ctx.send(poll.results())
 
-def run_bot():
-    # Define the Discord client object and connect it to the Discord API using the bot token
-    client = discord.Client()
-    @client.event
-    async def on_ready():
-        print(f'Logged in as {client.user}')
-
-    @client.command()
-    async def start(ctx, question, *options):
-        await start_vote(ctx, question, *options)
-
-    client.run('your-bot-token')
-
 # Create a new thread to run the bot
 bot_thread = threading.Thread(target=run_bot)
 bot_thread.start()
+
 #Run the bot
 bot.run(TOKEN)
     
