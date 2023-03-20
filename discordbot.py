@@ -242,7 +242,7 @@ class Poll:
             message += f'{emoji_map[i]} {option}: {self.votes[i]}\n'
         return message
 
-@bot.command(name='')
+@bot.command(name='투표')
 async def start_poll(ctx, question, options):
     # Create a new poll object and add options
     poll = Poll(question, options)
