@@ -210,7 +210,7 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-vote_counts = {}  # Create an empty dictionary to store vote counts
+vote_counts = {}
 
 @bot.command()
 async def 투표(ctx, *, args):
@@ -218,6 +218,8 @@ async def 투표(ctx, *, args):
     vote
     :param args: title and choice separated by commas (",")
     '''
+    global vote_counts
+    
     # TODO web
     # Disable TODO duplicate voting
     # Create a TODO anonymous vote
@@ -288,6 +290,12 @@ async def 투표(ctx, *, args):
             ax.set_xlabel('Vote Count')
             ax.set_title(title)
             plt.savefig('vote_counts.png')
+            
+            # Send the bar chart to Discord
+            with open('vote_counts.png', 'rb') as f:
+                image = discord.File(f)
+                await ctx.send(file=image)
+
                 
 #Run the bot
 bot.run(TOKEN)
