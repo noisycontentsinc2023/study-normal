@@ -17,8 +17,6 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional
 from discord.ext.commands import when_mentioned_or, CommandNotFound, has_permissions, NoPrivateMessage, Bot, \
     ExpectedClosingQuoteError
-from react_decorators import *
-from voting import voteDB
 
 translator = googletrans.Translator()
 intents = discord.Intents.default()
