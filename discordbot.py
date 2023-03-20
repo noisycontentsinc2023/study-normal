@@ -243,7 +243,7 @@ class Poll:
         return message
 
 @bot.command(name='투표')
-async def start_poll(ctx, question, options):
+async def start_poll(ctx, question, *options):
     # Create a new poll object and add options
     poll = Poll(question, options)
     
