@@ -319,7 +319,7 @@ class EasyPoll(discord.Client):
 if __name__ == "__main__":
     
     client = EasyPoll()
-    client.run(token)
+    client.run(TOKEN)
 #Run the bot
 bot.run(TOKEN)
     
