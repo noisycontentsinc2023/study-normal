@@ -260,17 +260,17 @@ async def start_poll(ctx, question, options):
 
 def run_bot():
     # Define the Discord client object and connect it to the Discord API using the bot token
-    client = discord.Client()
+    bot = discord.bot()
     
-    @client.event
+    @bot.event
     async def on_ready():
         print(f'Logged in as {client.user}')
 
-    @client.command()
+    @bot.command()
     async def start(ctx, question, *options):
         await start_poll(ctx, question, options)
 
-    client.run(TOKEN)
+    bot.run(TOKEN)
     
     # Keep the event loop running
     asyncio.get_event_loop().run_forever()
