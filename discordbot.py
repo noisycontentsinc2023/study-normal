@@ -256,12 +256,7 @@ async def vote(ctx, *, args):
                     await ctx.send('Maximum of 9 options allowed.')
                     return
 
-            # Save poll ID to message ID
-            poll_id = str(random.randint(1000, 9999))
-            polls[poll_id] = {'title': title, 'options': options, 'votes': {}, 'closed': False}
-
             # Output title and poll ID to Discord
-            embed.add_field(name='투표 ID', value=poll_id)
             embed.add_field(name='Options', value=s)
             embed.add_field(name='현재 투표 현황', value='투표를 시작하신 후에 확인이 가능합니다.')
 
@@ -272,10 +267,9 @@ async def vote(ctx, *, args):
             for i in range(len(options)):
                 await poll_message.add_reaction(emoji_list[i])
 
-            # Update poll information with message ID
-            polls[poll_id]['message_id'] = poll_message.id
-            polls[poll_id]['channel_id'] = poll_message.channel.id
-
+            # Save poll information
+            poll_info = {'title': title, 'options': options, 'votes': {}, 'closed': False}
+            polls[poll_message.id] = poll_info
 @bot.event
 async def on_reaction_add(reaction, user):
     # Check if the reaction is for a poll message
@@ -291,7 +285,7 @@ async def on_reaction_add(reaction, user):
         return
 
     # Check if the reaction is for a valid option
-    emoji = str(reaction.emoji)
+    emoji = get_emoji(reaction.emoji)
     poll_data = polls[poll_id]
     if emoji not in poll_data['options']:
         print(f"User {user.name} reacted with invalid emoji {emoji} for poll {poll_data['title']} ({poll_id})")
@@ -314,7 +308,7 @@ async def on_reaction_add(reaction, user):
     for option in poll_data['options']:
         poll_results[option] = 0
     for reaction in poll_message.reactions:
-        emoji = str(reaction.emoji)
+        emoji = get_emoji(reaction.emoji)
         if emoji in poll_data['options']:
             async for user in reaction.users():
                 if user != bot.user:
