@@ -306,12 +306,17 @@ async def close_poll(ctx, poll_id: str):
     for reaction in poll_message.reactions:
         emoji = get_emoji(reaction.emoji)
         if emoji in poll_data['options']:
-            poll_results[emoji] = reaction.count - 1
+            async for user in reaction.users():
+                if user != bot.user:
+                    if emoji in poll_results:
+                        poll_results[emoji].append(user.id)
+                    else:
+                        poll_results[emoji] = [user.id]
 
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
     for option in poll_data['options']:
-        count = poll_results.get(option, 0)
+        count = len(poll_results.get(option, []))
         result_message += f'{option}: {count} vote(s)\n'
 
     # Create embed
