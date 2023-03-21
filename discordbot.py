@@ -308,10 +308,6 @@ async def close_poll(ctx, poll_id: str):
         if emoji in poll_data['options']:
             poll_results[emoji] = reaction.count - 1
 
-    # Update poll data with votes
-    for option, count in poll_results.items():
-        polls[poll_id]['votes'][option] = count
-
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
     for option in poll_data['options']:
@@ -319,7 +315,7 @@ async def close_poll(ctx, poll_id: str):
         result_message += f'{option}: {count} vote(s)\n'
 
     # Create embed
-    embed = discord.Embed(title=f'Poll results for {poll_id}', description=result_message)
+    embed = discord.Embed(title=f'Poll results for {poll_data["title"]}', description=result_message)
 
     # Send result message as an embed
     await ctx.send(embed=embed)
