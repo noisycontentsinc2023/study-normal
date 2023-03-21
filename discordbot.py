@@ -214,8 +214,12 @@ async def search(ctx, *args):
 def get_emoji(emoji):
     if isinstance(emoji, str):
         return emoji
-    else:
+    elif isinstance(emoji, discord.Emoji):
         return f'{emoji.name}:{emoji.id}'
+    elif isinstance(emoji, discord.PartialEmoji):
+        return f'{emoji.name}:{emoji.id}'
+    else:
+        return None
 
 polls = {}
 
