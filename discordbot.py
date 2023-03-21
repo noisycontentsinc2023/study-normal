@@ -211,15 +211,6 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-def get_emoji(emoji):
-    if isinstance(emoji, str):
-        return emoji
-    else:
-        return f'{emoji.name}:{emoji.id}'
-
-polls = {}
-
-@bot.command(name='투표')
 async def vote(ctx, *, args):
     if not args:
         embed = discord.Embed(title=f'Vote Help', description=f'')
@@ -259,6 +250,7 @@ async def vote(ctx, *, args):
             # Output title and poll ID to Discord
             embed.add_field(name='투표 ID', value=poll_id)
             embed.add_field(name='Options', value=s)
+            embed.add_field(name='현재 투표 현황', value='투표를 시작하신 후에 확인이 가능합니다.')
 
             # Send poll message
             poll_message = await ctx.send('Poll created!', embed=embed)
@@ -269,69 +261,57 @@ async def vote(ctx, *, args):
 
             # Update poll information with message ID
             polls[poll_id]['message_id'] = poll_message.id
-
-            # Create and send a message with the current poll status
-            poll_data = polls[poll_id]
-            poll_results = poll_data['votes']
-            status_message = f"**Current poll status for {title}:**\n"
-            for i, option in enumerate(options):
-                count = poll_results.get(i, 0)
-                status_message += f"{emoji_list[i]} {option}: {count} vote(s)\n"
-            await ctx.send(status_message)
-
-            # Remove additional reactions added by users
-            for reaction in poll_message.reactions:
-                emoji = get_emoji(reaction.emoji)
-                if emoji not in options:
-                    async for user in reaction.users():
-                        if user != bot.user:
-                            await poll_message.remove_reaction(reaction.emoji, user)
+            polls[poll_id]['channel_id'] = poll_message.channel.id
 
 @bot.event
 async def on_reaction_add(reaction, user):
-    # Check if reaction is to a poll message and not added by bot
-    if reaction.message.id in [poll_data['message_id'] for poll_data in polls.values()] and user != bot.user:
-        # Get poll ID
-        poll_id = None
-        for poll_data in polls.values():
-            if poll_data['message_id'] == reaction.message.id:
-                poll_id = str(list(polls.keys())[list(polls.values()).index(poll_data)])
-                break
+    # Check if the reaction is for a poll message
+    message_id = reaction.message.id
+    poll_id = None
+    for pid, poll in polls.items():
+        if 'message_id' in poll and poll['message_id'] == message_id:
+            poll_id = pid
+            break
 
-        # Update poll data
-        if poll_id is not None and not polls[poll_id]['closed']:
-            emoji = get_emoji(reaction.emoji)
-            options = polls[poll_id]['options']
-            if emoji in options:
-                polls[poll_id]['votes'][user.id] = emoji
+    if not poll_id:
+        return
 
-                # Update poll message with current poll results
-                poll_data = polls[poll_id]
-                poll_message_id = poll_data['message_id']
-                poll_message = await reaction.message.channel.fetch_message(poll_message_id)
+    # Check if the reaction is for a valid option
+    emoji = get_emoji(reaction.emoji)
+    poll_data = polls[poll_id]
+    if emoji not in poll_data['options']:
+        return
 
-                # Get poll results
-                poll_results = {}
-                for option in poll_data['options']:
-                    poll_results[option] = 0
-                for reaction in poll_message.reactions:
-                    emoji = get_emoji(reaction.emoji)
-                    if emoji in poll_data['options']:
-                        async for user in reaction.users():
-                            if user != bot.user:
-                                poll_results[emoji] += 1
+    # Add or update user vote
+    user_id = str(user.id)
+    if user_id not in poll_data['votes']:
+        poll_data['votes'][user_id] = emoji
+    else:
+        poll_data['votes'][user_id] = emoji
 
-                # Create result message
-                result_message = f'Poll results for {poll_data["title"]}:\n'
-                for option in poll_data['options']:
-                    count = poll_results[option]
-                    result_message += f'{option}: {count} vote(s)\n'
+    # Update poll embed with current vote count
+    poll_message_id = poll_data['message_id']
+    poll_message = await reaction.message.channel.fetch_message(poll_message_id)
 
-                # Create embed
-                embed = discord.Embed(title=f'Poll results for {poll_id}', description=result_message)
+    poll_results = {}
+    for option in poll_data['options']:
+        poll_results[option] = 0
+    for reaction in poll_message.reactions:
+        emoji = get_emoji(reaction.emoji)
+        if emoji in poll_data['options']:
+            async for user in reaction.users():
+                if user != bot.user:
+                    poll_results[emoji] += 1
 
-                # Update poll message with current poll results
-                await poll_message.edit(content='Poll updated!', embed=embed)
+    result_message = ''
+    for option in poll_data['options']:
+        count = poll_results[option]
+        result_message += f'{option}: {count} vote(s)\n'
+
+    poll_embed = poll_message.embeds[0]
+    poll_embed.set_field_at(1, name='현재 투표 현황', value=result_message)
+
+    await poll_message.edit(embed=poll_embed)
                 
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
