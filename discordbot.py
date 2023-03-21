@@ -270,7 +270,7 @@ async def vote(ctx, *, args):
             # Send poll ID to user
             embed.set_footer(text=f'Poll ID: {poll_id}')
             await ctx.send(embed=embed)
-
+            
 @bot.command(name='닫기')
 async def close(ctx, poll_id: str):
     """
@@ -306,7 +306,7 @@ async def close(ctx, poll_id: str):
         result_message += f'{option}: {poll_results.get(option, 0)} vote(s)\n'
 
     # Create embed
-    embed = discord.Embed(title=f'Poll results for ID {poll_id}', description=result_message)
+    embed = discord.Embed(title=f'Poll results for {poll_data["title"]} (ID: {poll_id})', description=result_message)
 
     # Send result message as an embed
     await ctx.send(embed=embed)
