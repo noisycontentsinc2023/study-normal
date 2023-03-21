@@ -214,9 +214,8 @@ async def search(ctx, *args):
 def get_emoji(emoji):
     if isinstance(emoji, str):
         return emoji
-    if not emoji.id:
-        return emoji
-    return '{0.name}:{0.id}'.format(emoji)
+    else:
+        return f'{emoji.name}:{emoji.id}'
 
 polls = {}
 
@@ -302,11 +301,15 @@ async def close_poll(ctx, poll_id: str):
     poll_message = await ctx.channel.fetch_message(poll_message_id)
 
     # Get poll results
-    poll_results = {option: 0 for option in poll_data['options']}
+    poll_results = {}
+    for option in poll_data['options']:
+        poll_results[option] = 0
     for reaction in poll_message.reactions:
         emoji = get_emoji(reaction.emoji)
         if emoji in poll_data['options']:
-            poll_results[emoji] += reaction.count - 1
+            async for user in reaction.users():
+                if user != bot.user:
+                    poll_results[emoji] += 1
 
     # Update poll data
     poll_data['closed'] = True
