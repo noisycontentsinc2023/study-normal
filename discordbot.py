@@ -262,7 +262,7 @@ async def vote(ctx, *, args):
                     return
 
             # Output title to Discord
-            embed.add_field(name='Options', value=s)
+            embed.add_field(name=poll_id, value=s)
 
             # Send poll message
             poll_message = await ctx.send('Poll created!', embed=embed)
