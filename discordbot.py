@@ -268,7 +268,8 @@ async def vote(ctx, *, args):
             polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
 
             # Send poll ID to user
-            await ctx.send(f'Poll ID {poll_id} created.')
+            embed.set_footer(text=f'Poll ID: {poll_id}')
+            await ctx.send(embed=embed)
 
 @bot.command(name='닫기')
 async def close(ctx, poll_id: str):
