@@ -242,7 +242,7 @@ async def vote(ctx, *, args):
         options = parts[1:]
 
         # Create embed
-        embed = discord.Embed(title=f'{title} (Poll ID: None)')
+        embed = discord.Embed(title=title)
         if not options:
             # Like/Dislike
             message = await ctx.send(embed=embed)
@@ -261,8 +261,7 @@ async def vote(ctx, *, args):
                     await ctx.send('Maximum of 9 options allowed.')
                     return
 
-            # Output title and poll ID to Discord
-            embed.title = f'{title} (Poll ID: {poll_id})'
+            # Output title to Discord
             embed.add_field(name='Options', value=s)
 
             # Send poll message
@@ -272,16 +271,11 @@ async def vote(ctx, *, args):
             for i in range(len(options)):
                 await poll_message.add_reaction(emoji_list[i])
 
-            # Save poll ID to message ID
-            poll_id = str(random.randint(1000, 9999))
-            polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
-
-            # Update poll message with poll ID
-            embed.title = f'{title} (Poll ID: {poll_id})'
-            await poll_message.edit(embed=embed)
+            # Save poll data
+            polls[poll_message.id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
 
             # Send poll ID to user
-            await ctx.send(f'Poll ID {poll_id} created.')
+            await ctx.send(f'Poll ID {poll_message.id} created.')
             
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
