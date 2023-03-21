@@ -211,26 +211,6 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-@tasks.loop(seconds=10)
-async def update_poll_results():
-    for poll_id, poll_data in polls.items():
-        if not poll_data['closed']:
-            poll_message_id = poll_data['message_id']
-            poll_message = await bot.get_channel(ctx.channel.id).fetch_message(poll_message_id)
-            poll_results = {option: 0 for option in poll_data['options']}
-            for reaction in poll_message.reactions:
-                emoji = get_emoji(reaction.emoji)
-                if emoji in poll_data['options']:
-                    poll_results[emoji] += reaction.count - 1
-            result_message = 'Poll results:\n'
-            for option, count in poll_results.items():
-                result_message += f'{option}: {count}\n'
-            embed = discord.Embed(title=poll_data['title'], description=result_message)
-            await poll_message.edit(embed=embed)
-
-# Start the background task
-update_poll_results.start()
-
 def get_emoji(emoji):
     if isinstance(emoji, str):
         return emoji
@@ -241,14 +221,6 @@ polls = {}
 
 @bot.command(name='투표')
 async def vote(ctx, *, args):
-    '''
-    vote
-    :param args: title and choice separated by commas (",")
-    '''
-    # TODO web
-    # Disable TODO duplicate voting
-    # Create a TODO anonymous vote
-    # Voting help
     if not args:
         embed = discord.Embed(title=f'Vote Help', description=f'')
         embed.add_field(name=f'Like/Dislike', value=f'!vote title')
