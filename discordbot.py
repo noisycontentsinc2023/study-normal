@@ -304,9 +304,13 @@ async def close_poll(ctx, poll_id: str):
     # Get poll results
     poll_results = {}
     for reaction in poll_message.reactions:
-        emoji = reaction.emoji
+        emoji = get_emoji(reaction.emoji)
         if emoji in poll_data['options']:
             poll_results[emoji] = reaction.count - 1
+
+    # Update poll data with votes
+    for option, count in poll_results.items():
+        polls[poll_id]['votes'][option] = count
 
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
