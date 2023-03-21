@@ -283,12 +283,14 @@ async def on_reaction_add(reaction, user):
             break
 
     if not poll_id:
+        print(f"Reaction received for non-poll message with message ID {message_id}")
         return
 
     # Check if the reaction is for a valid option
     emoji = get_emoji(reaction.emoji)
     poll_data = polls[poll_id]
     if emoji not in poll_data['options']:
+        print(f"User {user.name} reacted with invalid emoji {emoji} for poll {poll_data['title']} ({poll_id})")
         return
 
     # Add or update user vote
@@ -297,6 +299,8 @@ async def on_reaction_add(reaction, user):
         poll_data['votes'][user_id] = emoji
     else:
         poll_data['votes'][user_id] = emoji
+
+    print(f"User {user.name} voted for option {emoji} in poll {poll_data['title']} ({poll_id})")
 
     # Update poll embed with current vote count
     poll_message_id = poll_data['message_id']
@@ -321,6 +325,8 @@ async def on_reaction_add(reaction, user):
     poll_embed.set_field_at(1, name='현재 투표 현황', value=result_message)
 
     await poll_message.edit(embed=poll_embed)
+
+    print(f"Poll {poll_data['title']} ({poll_id}) updated with current vote count")
                 
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
