@@ -278,9 +278,6 @@ async def vote(ctx, *, args):
 
             # Update poll information with message ID
             polls[poll_id]['message_id'] = poll_message.id
-
-            # Send poll ID to user
-            await ctx.send(f'Poll ID {poll_id} created.')
             
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
