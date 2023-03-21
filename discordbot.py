@@ -231,13 +231,14 @@ async def vote(ctx, *, args):
     if not args:
         embed = discord.Embed(title=f'Vote Help', description=f'')
         embed.add_field(name=f'Like/Dislike', value=f'!vote title')
-        embed.add_field(name=f'multiple responses (1-9)', value=f'!vote title, choice 1, choice 2, ..., choice 9')
+        embed.add_field(name=f'multiple options (1-9)', value=f'!vote title, option 1, option 2, ..., option 9')
         await ctx.send(embed=embed)
     else:
         # Split title and options
         parts = [part.strip() for part in args.split(',')]
         title = parts[0]
         options = parts[1:]
+        # rest of the code
 
         # Create embed
         embed = discord.Embed(title=title)
