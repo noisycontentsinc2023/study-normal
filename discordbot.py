@@ -257,7 +257,7 @@ async def 투표(ctx, *, args):
             for i in range(len(options)):
                 await message.add_reaction(emoji_list[i])
 @bot.command()
-async def vote1(ctx, *, args):
+async def 1(ctx, *, args):
     '''
     anonymous vote
     :param args: title and choice separated by commas(",")
@@ -313,7 +313,7 @@ async def vote1(ctx, *, args):
             polls[poll_id]['message_id'] = poll_message.id
 
 @bot.command()
-async def close(ctx):
+async def (ctx):
     '''
     Close an ongoing poll and display the results
     '''
