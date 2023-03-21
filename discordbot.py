@@ -280,7 +280,7 @@ async def vote(ctx, *, args):
             await ctx.send(f'Poll ID {poll_id} created.')
             
 @bot.command(name='닫기')
-async def close_poll(ctx, poll_id: str):
+async def close(ctx, poll_id: str):
     """
     Close a poll and display the results
     :param poll_id: ID of the poll to close
@@ -304,18 +304,20 @@ async def close_poll(ctx, poll_id: str):
     # Get poll results
     poll_results = {}
     for reaction in poll_message.reactions:
-        emoji = reaction.emoji
+        if reaction.emoji.is_custom_emoji():
+            emoji = f'{reaction.emoji.name}:{reaction.emoji.id}'
+        else:
+            emoji = reaction.emoji
         if emoji in poll_data['options']:
             poll_results[emoji] = reaction.count - 1
 
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
     for option in poll_data['options']:
-        count = poll_results.get(option, 0)
-        result_message += f'{option}: {count} vote(s)\n'
+        result_message += f'{option}: {poll_results.get(option, 0)} vote(s)\n'
 
     # Create embed
-    embed = discord.Embed(title=f'Poll results for {poll_id}', description=result_message)
+    embed = discord.Embed(title=f'Poll results for ID {poll_id}', description=result_message)
 
     # Send result message as an embed
     await ctx.send(embed=embed)
