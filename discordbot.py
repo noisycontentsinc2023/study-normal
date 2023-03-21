@@ -297,6 +297,6 @@ async def close_poll(ctx, poll_id=None):
         result_message += f'{option}: {count} vote(s)\n'
 
     # Send result message
-    await ctx.send(result)         
+    await ctx.send(result_message)        
 #Run the bot
 bot.run(TOKEN)
