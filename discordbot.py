@@ -313,6 +313,9 @@ async def close_poll(ctx, poll_id: str):
                     else:
                         poll_results[emoji] = [user.id]
 
+    # Update poll data
+    poll_data['closed'] = True
+
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
     for option in poll_data['options']:
@@ -324,9 +327,6 @@ async def close_poll(ctx, poll_id: str):
 
     # Send result message as an embed
     await ctx.send(embed=embed)
-
-    # Update poll data
-    poll_data['closed'] = True
     
 #Run the bot
 bot.run(TOKEN)
