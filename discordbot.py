@@ -271,11 +271,12 @@ async def vote(ctx, *, args):
             for i in range(len(options)):
                 await poll_message.add_reaction(emoji_list[i])
 
-            # Save poll data
-            polls[poll_message.id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
+            # Save poll ID to message ID
+            poll_id = str(random.randint(1000, 9999))
+            polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
 
             # Send poll ID to user
-            await ctx.send(f'Poll ID {poll_message.id} created.')
+            await ctx.send(f'Poll ID {poll_id} created.')
             
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
