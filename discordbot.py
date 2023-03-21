@@ -271,8 +271,22 @@ async def vote(ctx, *, args):
             poll_info = {'title': title, 'options': options, 'votes': {}, 'closed': False}
             polls[poll_message.id] = poll_info
             
+
 @bot.event
 async def on_reaction_add(reaction, user):
+    # Check if the reaction is for a poll message
+    message_id = reaction.message.id
+    poll_id = None
+    for pid, poll in polls.items():
+        if 'message_id' in poll and poll['message_id'] == message_id:
+            poll_id = pid
+            break
+
+    if not poll_id:
+        print(f"Reaction received for non-poll message with message ID {message_id}")
+        return
+
+    # Rest of the code for handling the vote
     # Check if the reaction was added to a message sent by the bot
     if user == bot.user:
         return
