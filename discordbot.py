@@ -211,6 +211,7 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
+@bot.command(name='투표')
 async def vote(ctx, *, args):
     if not args:
         embed = discord.Embed(title=f'Vote Help', description=f'')
