@@ -210,6 +210,14 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
+# Function to convert custom emoji to Unicode
+def get_emoji(emoji):
+    if isinstance(emoji, str):
+        return emoji
+    if not emoji.id:
+        return emoji
+    return '{0.name}:{0.id}'.format(emoji)
+
 polls = {}
 
 @bot.command(name='투표')
@@ -268,11 +276,10 @@ async def vote(ctx, *, args):
             polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
 
             # Send poll ID to user
-            embed.set_footer(text=f'Poll ID: {poll_id}')
-            await ctx.send(embed=embed)
+            await ctx.send(f'Poll ID {poll_id} created.')
             
 @bot.command(name='닫기')
-async def close(ctx, poll_id: str):
+async def close_poll(ctx, poll_id: str):
     """
     Close a poll and display the results
     :param poll_id: ID of the poll to close
@@ -296,17 +303,18 @@ async def close(ctx, poll_id: str):
     # Get poll results
     poll_results = {}
     for reaction in poll_message.reactions:
-        emoji = get_emoji(reaction.emoji)
+        emoji = reaction.emoji
         if emoji in poll_data['options']:
             poll_results[emoji] = reaction.count - 1
 
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
     for option in poll_data['options']:
-        result_message += f'{option}: {poll_results.get(option, 0)} vote(s)\n'
+        count = poll_results.get(option, 0)
+        result_message += f'{option}: {count} vote(s)\n'
 
     # Create embed
-    embed = discord.Embed(title=f'Poll results for {poll_data["title"]} (ID: {poll_id})', description=result_message)
+    embed = discord.Embed(title=f'Poll results for {poll_id}', description=result_message)
 
     # Send result message as an embed
     await ctx.send(embed=embed)
