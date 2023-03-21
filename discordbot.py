@@ -291,7 +291,7 @@ async def on_reaction_add(reaction, user):
         return
 
     # Check if the reaction is for a valid option
-    emoji = get_emoji(reaction.emoji)
+    emoji = str(reaction.emoji)
     poll_data = polls[poll_id]
     if emoji not in poll_data['options']:
         print(f"User {user.name} reacted with invalid emoji {emoji} for poll {poll_data['title']} ({poll_id})")
@@ -314,7 +314,7 @@ async def on_reaction_add(reaction, user):
     for option in poll_data['options']:
         poll_results[option] = 0
     for reaction in poll_message.reactions:
-        emoji = get_emoji(reaction.emoji)
+        emoji = str(reaction.emoji)
         if emoji in poll_data['options']:
             async for user in reaction.users():
                 if user != bot.user:
