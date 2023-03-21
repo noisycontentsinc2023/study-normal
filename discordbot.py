@@ -258,61 +258,6 @@ async def 투표(ctx, *, args):
             # Output options to Discord
             for i in range(len(options)):
                 await message.add_reaction(emoji_list[i])
-@bot.command(name='투표1')
-async def 투표1(ctx, *, args):
-    '''
-    anonymous vote
-    :param args: title and choice separated by commas(",")
-    '''
-    if not args:
-        embed = discord.Embed(title='Vote Help', description='Developer: gagip')
-        embed.add_field(name='Like/Dislike', value='!vote1 title')
-        embed.add_field(name='Multiple responses(1-9)', value='!vote1 title, choice 1, choice 2, ..., choice 9')
-        await ctx.send(embed=embed)
-    else:
-        # Split title and options
-        parts = [part.strip() for part in args.split(',')]
-        title = parts[0]
-        options = parts[1:]
-
-        # Create poll ID
-        poll_id = str(random.randint(1000, 9999))
-
-        # Create poll dictionary
-        polls[poll_id] = {'title': title, 'options': options, 'votes': {}}
-
-        # Create embed
-        embed = discord.Embed(title=title)
-        if not options:
-            # Like/Dislike
-            message = await ctx.send(embed=embed)
-            await message.add_reaction('👍')
-            await message.add_reaction('👎')
-        else:
-            # Multiple answers (1-9)
-            emoji_list = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'] # Option number label
-
-            s = ''
-            emoji = iter(emoji_list)
-            for option in options:
-                try:
-                    s += f'{next(emoji)} {option}\n'
-                except StopIteration:
-                    await ctx.send('Maximum of 9 options allowed.')
-                    return
-
-            # Output title to Discord
-            embed.add_field(name='Options', value=s)
-
-            # Send poll message
-            poll_message = await ctx.send('Poll created!', embed=embed)
-
-            # Add reactions to poll message
-            for i in range(len(options)):
-                await poll_message.add_reaction(emoji_list[i])
-
-            # Save poll ID to message ID
-            polls[poll_id]['message_id'] = poll_message.id
 
 @bot.command(name='닫기')
 async def 닫기(ctx):
