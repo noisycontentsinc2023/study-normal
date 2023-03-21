@@ -264,38 +264,46 @@ async def vote(ctx, *, args):
 
 
 @bot.command(name='닫기')
-async def close(ctx, poll_id):
-    '''
-    Close an ongoing poll and display the results
+async def close_poll(ctx, poll_id: str):
+    """
+    Close a poll and display the results
     :param poll_id: ID of the poll to close
-    '''
-    if poll_id not in polls:
-        await ctx.send('Invalid poll ID.')
+    """
+    # Get poll data using poll ID
+    poll_data = polls.get(poll_id)
+
+    # Check if poll exists
+    if not poll_data:
+        await ctx.send(f'Poll with ID {poll_id} does not exist.')
         return
 
-    poll_data = polls[poll_id]
+    # Get poll message ID
+    poll_message_id = poll_data.get('message_id')
 
-    if 'message_id' not in poll_data or poll_data['message_id'] is None:
-        await ctx.send('No poll is currently open for this ID.')
+    # Check if poll message exists
+    if not poll_message_id:
+        await ctx.send(f'Poll with ID {poll_id} has no message ID.')
         return
+
+    # Get poll message
+    poll_message = await ctx.channel.fetch_message(poll_message_id)
 
     # Get poll results
     poll_results = {}
-    poll_message = await ctx.channel.fetch_message(poll_data['message_id'])
     for reaction in poll_message.reactions:
         if str(reaction.emoji) in poll_data['options']:
             poll_results[str(reaction.emoji)] = reaction.count - 1
 
     # Create result message
-    result_message = f'Poll closed for ID {poll_id}!\n'
+    result_message = f'Poll {poll_id} closed!\n'
     for option, count in poll_results.items():
         result_message += f'{option}: {count} vote(s)\n'
 
     # Send result message
     await ctx.send(result_message)
 
-    # Remove poll data
-    del polls[poll_id]
+    # Remove poll data from dictionary
+    polls.pop(poll_id)
 
 #Run the bot
 bot.run(TOKEN)
