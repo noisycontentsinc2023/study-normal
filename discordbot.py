@@ -265,48 +265,35 @@ async def vote(ctx, *, args):
 
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
-    '''
+    """
     Close an ongoing poll and display the results
     :param poll_id: ID of the poll to close
-    '''
+    """
+    # Check if poll ID exists
     if poll_id not in polls:
-        await ctx.send(f'Poll ID {poll_id} not found.')
+        await ctx.send(f"Poll with ID {poll_id} not found.")
         return
 
+    # Get poll data
     poll_data = polls[poll_id]
+    options = poll_data['options']
+    votes = poll_data['votes']
 
-    if 'message_id' not in poll_data:
-        await ctx.send(f'Poll ID {poll_id} has no message ID.')
+    # Check if poll is already closed
+    if poll_data['closed']:
+        await ctx.send(f"Poll with ID {poll_id} is already closed.")
         return
 
-    poll_message_id = poll_data['message_id']
-    poll_options = poll_data['options']
-    poll_title = poll_data['title']
-    poll_results = poll_data['votes']
+    # Mark poll as closed
+    poll_data['closed'] = True
 
-    # Get poll message
-    poll_message = await ctx.channel.fetch_message(poll_message_id)
+    # Create result embed
+    result_embed = discord.Embed(title=f"Poll Results: {poll_id}", color=0x00ff00)
+    for option in options:
+        result_embed.add_field(name=f"{option} voted", value=f"{votes.count(option)}", inline=True)
 
-    # Get all users who voted in the poll
-    users = []
-    for reaction in poll_message.reactions:
-        async for user in reaction.users():
-            if user.id != bot.user.id:
-                users.append(user)
-
-    # Create result message
-    result_message = f'Poll Results: {poll_title}\n\n'
-    for option in poll_options:
-        emoji = get_emoji(option)
-        count = poll_results.get(option, 0)
-        result_message += f'{emoji} voted {count}\n'
-
-    # Send result message as an embed
-    embed = discord.Embed(title='Poll Results', description=result_message)
-    await ctx.send(embed=embed)
-
-    # Delete poll data
-    del polls[poll_id]
+    # Send result message
+    await ctx.send(embed=result_embed)
 
 #Run the bot
 bot.run(TOKEN)
