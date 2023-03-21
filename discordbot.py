@@ -10,6 +10,7 @@ import re
 import time
 import datetime
 import uuid
+import string
 
 from bs4 import BeautifulSoup
 from discord import Embed
