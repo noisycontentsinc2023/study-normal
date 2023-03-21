@@ -265,46 +265,48 @@ async def vote(ctx, *, args):
 
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
-    """
-    Close a poll and display the results
+    '''
+    Close an ongoing poll and display the results
     :param poll_id: ID of the poll to close
-    """
-    # Get poll data using poll ID
-    poll_data = polls.get(poll_id)
-
-    # Check if poll exists
-    if not poll_data:
-        await ctx.send(f'Poll with ID {poll_id} does not exist.')
+    '''
+    if poll_id not in polls:
+        await ctx.send(f'Poll ID {poll_id} not found.')
         return
 
-    # Get poll message ID
-    poll_message_id = poll_data.get('message_id')
+    poll_data = polls[poll_id]
 
-    # Check if poll message exists
-    if not poll_message_id:
-        await ctx.send(f'Poll with ID {poll_id} has no message ID.')
+    if 'message_id' not in poll_data:
+        await ctx.send(f'Poll ID {poll_id} has no message ID.')
         return
+
+    poll_message_id = poll_data['message_id']
+    poll_options = poll_data['options']
+    poll_title = poll_data['title']
+    poll_results = poll_data['votes']
 
     # Get poll message
     poll_message = await ctx.channel.fetch_message(poll_message_id)
 
-    # Get poll results
-    poll_results = {}
+    # Get all users who voted in the poll
+    users = []
     for reaction in poll_message.reactions:
-        if str(reaction.emoji) in poll_data['options']:
-            users = await reaction.users().flatten()
-            poll_results[str(reaction.emoji)] = len(users) - 1
+        async for user in reaction.users():
+            if user.id != bot.user.id:
+                users.append(user)
 
-    # Create embed message for poll results
-    result_embed = discord.Embed(title=f'Poll Results (ID: {poll_id})')
-    for option, count in poll_results.items():
-        result_embed.add_field(name=f'{option} voted', value=f'{count} user(s)', inline=False)
+    # Create result message
+    result_message = f'Poll Results: {poll_title}\n\n'
+    for option in poll_options:
+        emoji = get_emoji(option)
+        count = poll_results.get(option, 0)
+        result_message += f'{emoji} voted {count}\n'
 
     # Send result message as an embed
-    await ctx.send(embed=result_embed)
+    embed = discord.Embed(title='Poll Results', description=result_message)
+    await ctx.send(embed=embed)
 
-    # Remove poll data from dictionary
-    polls.pop(poll_id)
+    # Delete poll data
+    del polls[poll_id]
 
 #Run the bot
 bot.run(TOKEN)
