@@ -211,7 +211,6 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-# Function to convert custom emoji to Unicode
 def get_emoji(emoji):
     if isinstance(emoji, str):
         return emoji
@@ -243,7 +242,7 @@ async def vote(ctx, *, args):
         options = parts[1:]
 
         # Create embed
-        embed = discord.Embed(title=title)
+        embed = discord.Embed(title=f'{title} (Poll ID: None)')
         if not options:
             # Like/Dislike
             message = await ctx.send(embed=embed)
@@ -263,7 +262,7 @@ async def vote(ctx, *, args):
                     return
 
             # Output title and poll ID to Discord
-            embed.add_field(name='Poll ID', value=f'{poll_id}')
+            embed.title = f'{title} (Poll ID: {poll_id})'
             embed.add_field(name='Options', value=s)
 
             # Send poll message
@@ -277,11 +276,12 @@ async def vote(ctx, *, args):
             poll_id = str(random.randint(1000, 9999))
             polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
 
-            # Update poll embed with poll ID
-            embed.set_field_at(0, name='Poll ID', value=f'{poll_id}')
+            # Update poll message with poll ID
+            embed.title = f'{title} (Poll ID: {poll_id})'
+            await poll_message.edit(embed=embed)
 
             # Send poll ID to user
-            await ctx.send(embed=embed)
+            await ctx.send(f'Poll ID {poll_id} created.')
             
 @bot.command(name='닫기')
 async def close_poll(ctx, poll_id: str):
