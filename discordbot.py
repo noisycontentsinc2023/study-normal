@@ -208,7 +208,7 @@ async def search(ctx, *args):
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
-@bot.command()
+@bot.command(name='투표')
 async def 투표(ctx, *, args):
     '''
     vote
@@ -256,8 +256,8 @@ async def 투표(ctx, *, args):
             # Output options to Discord
             for i in range(len(options)):
                 await message.add_reaction(emoji_list[i])
-@bot.command()
-async def 1(ctx, *, args):
+@bot.command(name='투표1')
+async def 투표1(ctx, *, args):
     '''
     anonymous vote
     :param args: title and choice separated by commas(",")
@@ -312,7 +312,7 @@ async def 1(ctx, *, args):
             # Save poll ID to message ID
             polls[poll_id]['message_id'] = poll_message.id
 
-@bot.command()
+@bot.command(name='닫기')
 async def (ctx):
     '''
     Close an ongoing poll and display the results
