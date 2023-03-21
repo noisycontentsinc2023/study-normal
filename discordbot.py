@@ -300,8 +300,9 @@ async def close_poll(ctx, poll_id: str):
     poll_message_id = poll_data['message_id']
     poll_message = await ctx.channel.fetch_message(poll_message_id)
 
-    # Get poll results
-    poll_results = {option: 0 for option in poll_data['options']}
+    poll_results = {}
+    for option in poll_data['options']:
+        poll_results[option] = 0
     for reaction in poll_message.reactions:
         emoji = get_emoji(reaction.emoji)
         if emoji in poll_data['options']:
