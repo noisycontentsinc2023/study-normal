@@ -315,7 +315,7 @@ async def close_poll(ctx, poll_id: str):
         result_message += f'{option}: {count} vote(s)\n'
 
     # Create embed
-    embed = discord.Embed(title=f'Poll results for {poll_data["title"]}', description=result_message)
+    embed = discord.Embed(title=f'Poll results for {poll_id}', description=result_message)
 
     # Send result message as an embed
     await ctx.send(embed=embed)
