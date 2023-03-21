@@ -261,8 +261,13 @@ async def vote(ctx, *, args):
                     await ctx.send('Maximum of 9 options allowed.')
                     return
 
-            # Output title to Discord
-            embed.add_field(name='Poll ID', value=f'{poll_id}\n{s}')
+            # Save poll ID to message ID
+            poll_id = str(random.randint(1000, 9999))
+            polls[poll_id] = {'title': title, 'options': options, 'votes': {}, 'closed': False}
+
+            # Output title and poll ID to Discord
+            embed.add_field(name='투표 ID', value=poll_id)
+            embed.add_field(name='Options', value=s)
 
             # Send poll message
             poll_message = await ctx.send('Poll created!', embed=embed)
@@ -271,9 +276,8 @@ async def vote(ctx, *, args):
             for i in range(len(options)):
                 await poll_message.add_reaction(emoji_list[i])
 
-            # Save poll ID to message ID
-            poll_id = str(random.randint(1000, 9999))
-            polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
+            # Update poll information with message ID
+            polls[poll_id]['message_id'] = poll_message.id
 
             # Send poll ID to user
             await ctx.send(f'Poll ID {poll_id} created.')
