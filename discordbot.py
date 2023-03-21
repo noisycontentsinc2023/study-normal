@@ -265,9 +265,10 @@ async def vote(ctx, *, args):
 
             # Save poll ID to message ID
             poll_id = str(random.randint(1000, 9999))
-            polls[poll_id]['message_id'] = poll_message.id
-            polls[poll_id]['title'] = title
-            polls[poll_id]['options'] = options
+            polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
+
+            # Send poll ID to user
+            await ctx.send(f'Poll ID {poll_id} created.')
 
 @bot.command(name='닫기')
 async def close(ctx, poll_id: str):
@@ -294,13 +295,14 @@ async def close(ctx, poll_id: str):
     # Get poll results
     poll_results = {}
     for reaction in poll_message.reactions:
-        if str(reaction.emoji) in poll_data['options']:
-            poll_results[str(reaction.emoji)] = reaction.count - 1
+        emoji = get_emoji(reaction.emoji)
+        if emoji in poll_data['options']:
+            poll_results[emoji] = reaction.count - 1
 
     # Create result message
-    result_message = f'Poll results for ID {poll_id}:\n'
-    for option, count in poll_results.items():
-        result_message += f'{option}: {count} vote(s)\n'
+    result_message = f'Poll results for {poll_data["title"]}:\n'
+    for option in poll_data['options']:
+        result_message += f'{option}: {poll_results.get(option, 0)} vote(s)\n'
 
     # Create embed
     embed = discord.Embed(title=f'Poll results for ID {poll_id}', description=result_message)
