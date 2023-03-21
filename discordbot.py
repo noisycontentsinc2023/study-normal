@@ -214,76 +214,70 @@ polls = {}
 @bot.command(name='투표')
 async def vote(ctx, *, args):
     '''
-    vote
-    :param args: title and choice separated by commas(",")
+    Vote on a poll
+    :param args: title and options separated by commas (",")
     '''
-    # ALL web
-    # Disable ALL duplicate voting
-    # Create a TODO anonymous vote
-    # Voting help
-    if not args:
-        embed = discord.Embed(title=f'Vote Help', description=f'테이망령')
-        embed.add_field(name=f'Like/Dislike', value=f'!vote title')
-        embed.add_field(name=f'multipleresponses(1-9)', value=f'!vote title, choice 1, choice 2, ..., choice 9');
-        await ctx.send(embed=embed)
+    # Split title and options
+    parts = [part.strip() for part in args.split(',')]
+    title = parts[0]
+    options = parts[1:]
+
+    # Create poll ID
+    poll_id = str(uuid.uuid4().int & (1<<32)-1)
+
+    # Create poll dictionary
+    polls[poll_id] = {'title': title, 'options': options, 'votes': {}}
+
+    # Create embed
+    embed = discord.Embed(title=title)
+    embed.add_field(name='Poll ID', value=poll_id, inline=False)
+    if not options:
+        # Like/Dislike
+        message = await ctx.send(embed=embed)
+        await message.add_reaction('👍')
+        await message.add_reaction('👎')
     else:
-        # Split title and options
-        parts = [part.strip() for part in args.split(',')]
-        title = parts[0]
-        options = parts[1:]
+        # Multiple responses (1-9)
+        emoji_list = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']  # Option number label
 
-        # Generate unique poll ID
-        poll_id = str(uuid.uuid4())
+        s = ''
+        emoji = iter(emoji_list)
+        for option in options:
+            try:
+                s += f'{next(emoji)} {option}\n'
+            except StopIteration:
+                await ctx.send('Maximum of 9 options allowed.')
+                return
 
-        # Create embed
-        embed = discord.Embed(title=f'{title} (Poll ID: {poll_id})')
-        if not options:
-            # Like/Dislike
-            message = await ctx.send(embed=embed)
-            await message.add_reaction('👍')
-            await message.add_reaction('👎')
-        else:
-            # Multiple answers (1-9)
-            emoji_list = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'] # Option number label
+        # Output options to Discord
+        embed.add_field(name='Options', value=s)
 
-            s = ''
-            emoji = iter(emoji_list)
-            for option in options:
-                try:
-                    s += f'{next(emoji)}{option}\n'
-                except StopIteration:
-                    await ctx.send('옵션은 9개까지만 설정할 수 있어요')
-                    return
+        # Send poll message
+        poll_message = await ctx.send('Poll created!', embed=embed)
 
-            # Output title to Discord
-            embed.add_field(name=s, value='')
+        # Add reactions to poll message
+        for i in range(len(options)):
+            await poll_message.add_reaction(emoji_list[i])
 
-            # Send poll message
-            poll_message = await ctx.send('Poll created!', embed=embed)
+        # Save poll ID to message ID
+        polls[poll_id]['message_id'] = poll_message.id
 
-            # Add reactions to poll message
-            for i in range(len(options)):
-                await poll_message.add_reaction(emoji_list[i])
 
-            # Save poll ID to polls dictionary
-            polls[poll_id] = {'title': title, 'options': options, 'votes': {}, 'message_id': poll_message.id}
-
-@bot.command(name='닫기')
-async def close_poll(ctx, poll_id=None):
+@bot.command(name=기닫기')
+async def close(ctx, poll_id):
     '''
     Close an ongoing poll and display the results
+    :param poll_id: ID of the poll to close
     '''
-    # Get poll data from polls dictionary
-    if poll_id is None:
-        for pid, poll_data in polls.items():
-            if 'message_id' in poll_data and poll_data['message_id'] is not None:
-                poll_id = pid
-                break
-    if poll_id is None or poll_id not in polls:
-        await ctx.send('No poll found.')
+    if poll_id not in polls:
+        await ctx.send('Invalid poll ID.')
         return
 
     poll_data = polls[poll_id]
+
+    if 'message_id' not in poll_data or poll_data['message_id'] is None:
+        await ctx.send('No poll is currently open for this ID.')
+        return
 
     # Get poll results
     poll_results = {}
@@ -293,11 +287,15 @@ async def close_poll(ctx, poll_id=None):
             poll_results[str(reaction.emoji)] = reaction.count - 1
 
     # Create result message
-    result_message = 'Poll closed!\n'
+    result_message = f'Poll closed for ID {poll_id}!\n'
     for option, count in poll_results.items():
         result_message += f'{option}: {count} vote(s)\n'
 
     # Send result message
-    await ctx.send(result_message)        
+    await ctx.send(result_message)
+
+    # Remove poll data
+    del polls[poll_id]
+
 #Run the bot
 bot.run(TOKEN)
