@@ -213,8 +213,8 @@ async def search(ctx, *args):
 #------------------------------------------------투표------------------------------------------------------#  
 def get_emoji(emoji):
     if isinstance(emoji, str):
-        if emoji.startswith('option_'):
-            return emoji
+        if emoji.isdigit() and int(emoji) in range(1, 10):
+            return f'{emoji}\u20E3'  # Add keycap emoji to number
         else:
             return emoji.encode('unicode-escape').decode()
     elif isinstance(emoji, discord.Emoji):
