@@ -300,32 +300,17 @@ async def close_poll(ctx, poll_id: str):
     # Get poll message
     poll_message_id = poll_data['message_id']
     poll_message = await ctx.channel.fetch_message(poll_message_id)
-    
-    # Get poll results
-    poll_results = {}
-    for reaction in poll_message.reactions:
-        emoji = get_emoji(reaction.emoji)
-        if emoji in poll_data['options']:
-            async for user in reaction.users():
-                if user != bot.user:
-                    if emoji in poll_results:
-                        poll_results[emoji].append(user.id)
-                else:
-                    poll_results[emoji] = [user.id]
-                    poll_data['votes'][emoji] = []  # initialize empty list for option
-                poll_data['votes'][emoji].append(user.id)  # add user ID to option list
 
     # Get poll results
     poll_results = {}
+    for option in poll_data['options']:
+        poll_results[option] = 0
     for reaction in poll_message.reactions:
         emoji = get_emoji(reaction.emoji)
         if emoji in poll_data['options']:
             async for user in reaction.users():
                 if user != bot.user:
-                    if emoji in poll_results:
-                        poll_results[emoji].append(user.id)
-                    else:
-                        poll_results[emoji] = [user.id]
+                    poll_results[emoji] += 1
 
     # Update poll data
     poll_data['closed'] = True
@@ -333,7 +318,7 @@ async def close_poll(ctx, poll_id: str):
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
     for option in poll_data['options']:
-        count = len(poll_results.get(option, []))
+        count = poll_results[option]
         result_message += f'{option}: {count} vote(s)\n'
 
     # Create embed
