@@ -262,7 +262,8 @@ async def vote(ctx, *, args):
                     await ctx.send('Maximum of 9 options allowed.')
                     return
 
-            # Output title to Discord
+            # Output title and poll ID to Discord
+            embed.add_field(name='Poll ID', value=f'{poll_id}')
             embed.add_field(name='Options', value=s)
 
             # Send poll message
@@ -276,11 +277,14 @@ async def vote(ctx, *, args):
             poll_id = str(random.randint(1000, 9999))
             polls[poll_id] = {'message_id': poll_message.id, 'title': title, 'options': options, 'closed': False}
 
+            # Update poll embed with poll ID
+            embed.set_field_at(0, name='Poll ID', value=f'{poll_id}')
+
             # Send poll ID to user
-            await ctx.send(f'Poll ID {poll_id} created.')
+            await ctx.send(embed=embed)
             
 @bot.command(name='닫기')
-async def close(ctx, poll_id: str):
+async def close_poll(ctx, poll_id: str):
     """
     Close a poll and display the results
     :param poll_id: ID of the poll to close
@@ -304,20 +308,18 @@ async def close(ctx, poll_id: str):
     # Get poll results
     poll_results = {}
     for reaction in poll_message.reactions:
-        if reaction.emoji.is_custom_emoji():
-            emoji = f'{reaction.emoji.name}:{reaction.emoji.id}'
-        else:
-            emoji = reaction.emoji
+        emoji = reaction.emoji
         if emoji in poll_data['options']:
             poll_results[emoji] = reaction.count - 1
 
     # Create result message
     result_message = f'Poll results for {poll_data["title"]}:\n'
     for option in poll_data['options']:
-        result_message += f'{option}: {poll_results.get(option, 0)} vote(s)\n'
+        count = poll_results.get(option, 0)
+        result_message += f'{option}: {count} vote(s)\n'
 
     # Create embed
-    embed = discord.Embed(title=f'Poll results for ID {poll_id}', description=result_message)
+    embed = discord.Embed(title=f'Poll results for {poll_id}', description=result_message)
 
     # Send result message as an embed
     await ctx.send(embed=embed)
