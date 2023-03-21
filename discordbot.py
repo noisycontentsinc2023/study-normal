@@ -263,7 +263,7 @@ async def vote(ctx, *, args):
         polls[poll_id]['message_id'] = poll_message.id
 
 
-@bot.command(name=기닫기')
+@bot.command(name='닫기')
 async def close(ctx, poll_id):
     '''
     Close an ongoing poll and display the results
