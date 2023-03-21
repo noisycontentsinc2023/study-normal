@@ -210,7 +210,7 @@ async def search(ctx, *args):
 #------------------------------------------------투표------------------------------------------------------#  
 polls = {}
 
-@bot.command(name=투표')
+@bot.command(name='투표')
 async def vote(ctx, *, args):
     '''
     vote
