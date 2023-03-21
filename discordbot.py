@@ -294,13 +294,13 @@ async def close_poll(ctx, poll_id: str):
         if str(reaction.emoji) in poll_data['options']:
             poll_results[str(reaction.emoji)] = reaction.count - 1
 
-    # Create result message
-    result_message = f'Poll {poll_id} closed!\n'
+    # Create embed message for poll results
+    result_embed = discord.Embed(title=f'Poll Results (ID: {poll_id})')
     for option, count in poll_results.items():
-        result_message += f'{option}: {count} vote(s)\n'
+        result_embed.add_field(name=f'{option} voted', value=f'{count}', inline=False)
 
-    # Send result message
-    await ctx.send(result_message)
+    # Send result message as an embed
+    await ctx.send(embed=result_embed)
 
     # Remove poll data from dictionary
     polls.pop(poll_id)
