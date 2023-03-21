@@ -213,7 +213,10 @@ async def search(ctx, *args):
 #------------------------------------------------투표------------------------------------------------------#  
 def get_emoji(emoji):
     if isinstance(emoji, str):
-        return emoji
+        if emoji.startswith('option_'):
+            return emoji
+        else:
+            return emoji.encode('unicode-escape').decode()
     elif isinstance(emoji, discord.Emoji):
         return f'{emoji.name}:{emoji.id}'
     elif isinstance(emoji, discord.PartialEmoji):
