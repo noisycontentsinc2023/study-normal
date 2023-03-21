@@ -300,6 +300,7 @@ async def close_poll(ctx, poll_id: str):
     poll_message_id = poll_data['message_id']
     poll_message = await ctx.channel.fetch_message(poll_message_id)
 
+    # Get poll results
     poll_results = {}
     for option in poll_data['options']:
         poll_results[option] = 0
@@ -308,6 +309,7 @@ async def close_poll(ctx, poll_id: str):
         if emoji in poll_data['options']:
             async for user in reaction.users():
                 if user != bot.user:
+                    poll_data['votes'][user.id] = emoji  # store user's vote
                     poll_results[emoji] += 1
 
     # Update poll data
