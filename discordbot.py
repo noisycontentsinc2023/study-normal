@@ -254,7 +254,8 @@ async def vote(ctx, *, args):
             embed.add_field(name='현재 투표 현황', value='투표를 시작하신 후에 확인이 가능합니다.')
 
             # Send poll message
-            poll_message = await ctx.send('Poll created!', embed=embed)
+            random_poll_id = str(random.randint(1000, 9999))
+            poll_message = await ctx.send(f'투표가 생성되었어요! 투표 번호는: {random_poll_id}', embed=embed)
 
             # Add reactions to poll message
             for i in range(len(options)):
