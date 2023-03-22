@@ -383,7 +383,7 @@ async def close_poll(ctx, poll_id: str):
     
 @bot.command(name='말하기')
 async def speak(ctx):
-    embed = discord.Embed(title="언어선택", description="참여를 희망하는 언어 스터디를 선택해주세요", color=0x00ff00)
+    embed = discord.Embed(title="Choose your country", description="Please choose your country below:", color=0x00ff00)
     embed.add_field(name="France", value="🇫🇷", inline=True)
     embed.add_field(name="Spain", value="🇪🇸", inline=True)
     embed.add_field(name="USA", value="🇺🇸", inline=True)
