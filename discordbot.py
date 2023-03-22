@@ -145,35 +145,22 @@ async def dice(ctx):
 
 #------------------------------------------------이벤트------------------------------------------------------# 
 
-@bot.command(name='이벤트')
+@bot.command(name='클래스')
 async def event(ctx):
         hdr={'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
-        url='http://studymini.com'
+        url='http://studymini.com/class'
         req=urllib.request.Request(url=url, headers=hdr)
         url_open=urllib.request.urlopen(req)
         
         bs=BeautifulSoup(url_open,'html.parser')
 
         #이벤트 이미지 가져오기
-        vent1 = bs.select('div>h2>a')[0].get_text()
-        vent11_url = bs.select('div>h2>a')[1].get('href')
-        vent11 = bs.select('div>h2>a')[1].get_text()
-        vent2 = bs.select('div>h2>a')[3].get_text()
-        vent21_url = bs.select('div>h2>a')[4].get('href')
-        vent21 = bs.select('div>h2>a')[4].get_text()
-        vent3 = bs.select('div>h2>a')[6].get_text()
-        vent31_url = bs.select('div>h2>a')[7].get('href')
-        vent31 = bs.select('div>h2>a')[7].get_text()
-
-
-        embed = discord.Embed(title="현재 진행중인 이벤트", description="자세한 정보는 홈페이지를 참고해주세요 http://studymini.com/", color=0x62c1cc)
-        embed.add_field(name="이벤트 1", value=f"{vent1}\n\u200c{vent11}\n [자세히 보기]({vent11_url})", inline=True)
-        embed.add_field(name="이벤트 2", value=f"{vent2}\n\u200c{vent21}\n [자세히 보기]({vent21_url})", inline=True)
-        embed.add_field(name="이벤트 3", value=f"{vent3}\n\u200c{vent31}\n [자세히 보기]({vent31_url})", inline=True)
-
-        # 가운데 정렬
-        for field in embed.fields:
-            field.value = f"{field.value.center(40, ' ')}"
+        class1 = bs.select('#content > div > div > div > div > section.elementor-section.elementor-top-section.elementor-element.elementor-element-74bbde4.elementor-section-stretched.elementor-section-boxed.elementor-section-height-default.elementor-section-height-default > div > div > div > div > div > section > div > div > div.elementor-column.elementor-col-50.elementor-inner-column.elementor-element.elementor-element-22ec587 > div > div > div.elementor-element.elementor-element-042cc2a.elementor-widget.elementor-widget-heading > div > h2')
+        class11 = bs.select_one('#content > div > div > div > div > section.elementor-section.elementor-top-section.elementor-element.elementor-element-74bbde4.elementor-section-stretched.elementor-section-boxed.elementor-section-height-default.elementor-section-height-default > div > div > div > div > div > section > div > div > div.elementor-column.elementor-col-50.elementor-inner-column.elementor-element.elementor-element-22ec587 > div > div > div.elementor-element.elementor-element-121a28d.elementor-widget.elementor-widget-image > div > div > img')["src"]
+        class1_url = bs.select_one('#content > div > div > div > div > section.elementor-section.elementor-top-section.elementor-element.elementor-element-74bbde4.elementor-section-stretched.elementor-section-boxed.elementor-section-height-default.elementor-section-height-default > div > div > div > div > div > section > div > div > div.elementor-column.elementor-col-50.elementor-inner-column.elementor-element.elementor-element-22ec587 > div > div > div.elementor-element.elementor-element-1d60365.elementor-align-center.elementor-widget.elementor-widget-button > div > div > a')["href"]
+       
+        embed = discord.Embed(title="현재 진행중인 클래스", description="자세한 정보는 홈페이지를 참고해주세요 http://studymini.com/class", color=0x62c1cc)
+        embed.add_field(name="클래스 1", value=f"{class1}\n\u200c{class11}\n [자세히 보기]({class1_url})", inline=True)     
             
         await ctx.send(embed=embed)
 
