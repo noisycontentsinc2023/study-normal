@@ -395,7 +395,7 @@ selected_flags = {flag: [] for flag in country_flags.values()}
 async def update_embed(embed: discord.Embed) -> None:
     for country, flag in country_flags.items():
         users = ", ".join([f"<@{user_id}>" for user_id in selected_flags[flag]]) or "None"
-        embed.add_field(name=f"{flag} {country}", value=f"Selected by: {users}", inline=True)
+        embed.add_field(name=f"{flag} {country}", value=f"현재 참여자: {users}", inline=True)
     return embed
 
 @bot.command(name='말하기')
@@ -423,7 +423,7 @@ async def on_reaction_add(reaction, user):
             selected_flags[reaction.emoji].remove(user.id)
             await user.remove_roles(role)
 
-        embed = discord.Embed(title="Select your country")
+        embed = discord.Embed(title="함여할 스터디의 국기를 클릭해주세요")
         embed = await update_embed(embed)
 
         await reaction.message.edit(embed=embed)
