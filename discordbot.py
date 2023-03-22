@@ -381,9 +381,9 @@ async def close_poll(ctx, poll_id: str):
 
 #------------------------------------------------말하기------------------------------------------------------# 
     
-@bot.command()
+@bot.command(name='말하기')
 async def speak(ctx):
-    embed = discord.Embed(title="Choose your country", description="Please choose your country below:", color=0x00ff00)
+    embed = discord.Embed(title="언어선택", description="참여를 희망하는 언어 스터디를 선택해주세요", color=0x00ff00)
     embed.add_field(name="France", value="🇫🇷", inline=True)
     embed.add_field(name="Spain", value="🇪🇸", inline=True)
     embed.add_field(name="USA", value="🇺🇸", inline=True)
@@ -401,23 +401,27 @@ async def speak(ctx):
     country_emojis = {'🇫🇷': [], '🇪🇸': [], '🇺🇸': [], '🇨🇳': [], '🇯🇵': [], '🇩🇪': []}
     while True:
         try:
-            reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+            reaction, user = await bot.wait_for('reaction_add', check=check)
         except asyncio.TimeoutError:
             await ctx.send("Timed out")
             break
         else:
             country_emoji = reaction.emoji
-            country_emojis[country_emoji].append(user.mention)
+            if user.mention in country_emojis[country_emoji]:
+                country_emojis[country_emoji].remove(user.mention)
+            else:
+                for emojis in country_emojis.values():
+                    if user.mention in emojis:
+                        emojis.remove(user.mention)
+                country_emojis[country_emoji].append(user.mention)
 
             embed = discord.Embed(title="Choose your country", description="Please choose your country below:", color=0x00ff00)
-            embed.add_field(name="France", value=f"{country_emojis['🇫🇷']} 🇫🇷", inline=True)
-            embed.add_field(name="Spain", value=f"{country_emojis['🇪🇸']} 🇪🇸", inline=True)
-            embed.add_field(name="USA", value=f"{country_emojis['🇺🇸']} 🇺🇸", inline=True)
-            embed.add_field(name="China", value=f"{country_emojis['🇨🇳']} 🇨🇳", inline=True)
-            embed.add_field(name="Japan", value=f"{country_emojis['🇯🇵']} 🇯🇵", inline=True)
-            embed.add_field(name="Germany", value=f"{country_emojis['🇩🇪']} 🇩🇪", inline=True)
-
-            await message.edit(embed=embed)
+            embed.add_field(value=f"{', '.join(country_emojis['🇫🇷'])} 🇫🇷", inline=True)
+            embed.add_field(value=f"{', '.join(country_emojis['🇪🇸'])} 🇪🇸", inline=True)
+            embed.add_field(value=f"{', '.join(country_emojis['🇺🇸'])} 🇺🇸", inline=True)
+            embed.add_field(value=f"{', '.join(country_emojis['🇨🇳'])} 🇨🇳", inline=True)
+            embed.add_field(value=f"{', '.join(country_emojis['🇯🇵'])} 🇯🇵", inline=True)
+            embed.add_field(value=f"{', '.join(country_emojis['🇩🇪'])} 🇩🇪", inline=True)
             
 #Run the bot
 bot.run(TOKEN)
