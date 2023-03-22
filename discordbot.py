@@ -401,7 +401,7 @@ async def speak(ctx):
     country_emojis = {'🇫🇷': [], '🇪🇸': [], '🇺🇸': [], '🇨🇳': [], '🇯🇵': [], '🇩🇪': []}
     while True:
         try:
-            reaction, user = await bot.wait_for('reaction_add', check=check)
+            reaction, user = await bot.wait_for('reaction_add', timeout=None, check=check)
         except asyncio.TimeoutError:
             await ctx.send("Timed out")
             break
