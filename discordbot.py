@@ -381,47 +381,48 @@ async def close_poll(ctx, poll_id: str):
 
 #------------------------------------------------말하기------------------------------------------------------# 
     
+country_flags = {
+    "Spain": "🇪🇸",
+    "USA": "🇺🇸",
+    "Japan": "🇯🇵",
+    "China": "🇨🇳",
+    "France": "🇫🇷",
+    "Germany": "🇩🇪",
+}
+
+selected_flags = {flag: [] for flag in country_flags.values()}
+
+async def update_embed(embed: discord.Embed) -> None:
+    for country, flag in country_flags.items():
+        users = ", ".join([str(user_id) for user_id in selected_flags[flag]]) or "None"
+        embed.add_field(name=f"{flag} {country}", value=f"Selected by: {users}", inline=True)
+    return embed
+
 @bot.command(name='말하기')
 async def speak(ctx):
-    embed = discord.Embed(title="Choose your country", description="Please choose your country below:", color=0x00ff00)
-    embed.add_field(name="France", value="🇫🇷", inline=True)
-    embed.add_field(name="Spain", value="🇪🇸", inline=True)
-    embed.add_field(name="USA", value="🇺🇸", inline=True)
-    embed.add_field(name="China", value="🇨🇳", inline=True)
-    embed.add_field(name="Japan", value="🇯🇵", inline=True)
-    embed.add_field(name="Germany", value="🇩🇪", inline=True)
+    embed = discord.Embed(title="Select your country")
+    embed = await update_embed(embed)
 
     message = await ctx.send(embed=embed)
-    for emoji in ['🇫🇷', '🇪🇸', '🇺🇸', '🇨🇳', '🇯🇵', '🇩🇪']:
-        await message.add_reaction(emoji)
+    for flag in country_flags.values():
+        await message.add_reaction(flag)
 
-    def check(reaction, user):
-        return user == ctx.message.author and str(reaction.emoji) in ['🇫🇷', '🇪🇸', '🇺🇸', '🇨🇳', '🇯🇵', '🇩🇪']
+@bot.event
+async def on_reaction_add(reaction, user):
+    if user == bot.user:
+        return
 
-    country_emojis = {'🇫🇷': [], '🇪🇸': [], '🇺🇸': [], '🇨🇳': [], '🇯🇵': [], '🇩🇪': []}
-    while True:
-        try:
-            reaction, user = await bot.wait_for('reaction_add', timeout=None, check=check)
-        except asyncio.TimeoutError:
-            await ctx.send("Timed out")
-            break
+    if reaction.emoji in country_flags.values():
+        if user.id not in selected_flags[reaction.emoji]:
+            selected_flags[reaction.emoji].append(user.id)
         else:
-            country_emoji = reaction.emoji
-            if user.mention in country_emojis[country_emoji]:
-                country_emojis[country_emoji].remove(user.mention)
-            else:
-                for emojis in country_emojis.values():
-                    if user.mention in emojis:
-                        emojis.remove(user.mention)
-                country_emojis[country_emoji].append(user.mention)
+            selected_flags[reaction.emoji].remove(user.id)
 
-            embed = discord.Embed(title="Choose your country", description="Please choose your country below:", color=0x00ff00)
-            embed.add_field(name="프랑스어", value=f"{', '.join(country_emojis['🇫🇷'])} 🇫🇷", inline=True)
-            embed.add_field(name="스페인어", value=f"{', '.join(country_emojis['🇪🇸'])} 🇪🇸", inline=True)
-            embed.add_field(name="영어", value=f"{', '.join(country_emojis['🇺🇸'])} 🇺🇸", inline=True)
-            embed.add_field(name="중국어", value=f"{', '.join(country_emojis['🇨🇳'])} 🇨🇳", inline=True)
-            embed.add_field(name="일본어", value=f"{', '.join(country_emojis['🇯🇵'])} 🇯🇵", inline=True)
-            embed.add_field(name="독일어", value=f"{', '.join(country_emojis['🇩🇪'])} 🇩🇪", inline=True)
+        embed = discord.Embed(title="Select your country")
+        embed = await update_embed(embed)
+
+        await reaction.message.edit(embed=embed)
+        await reaction.remove(user)
             
 #Run the bot
 bot.run(TOKEN)
