@@ -394,13 +394,13 @@ selected_flags = {flag: [] for flag in country_flags.values()}
 
 async def update_embed(embed: discord.Embed) -> None:
     for country, flag in country_flags.items():
-        users = ", ".join([str(user_id) for user_id in selected_flags[flag]]) or "None"
+        users = ", ".join([f"<@{user_id}>" for user_id in selected_flags[flag]]) or "None"
         embed.add_field(name=f"{flag} {country}", value=f"Selected by: {users}", inline=True)
     return embed
 
 @bot.command(name='말하기')
 async def speak(ctx):
-    embed = discord.Embed(title="Select your country")
+    embed = discord.Embed(title="함여할 스터디의 국기를 클릭해주세요")
     embed = await update_embed(embed)
 
     message = await ctx.send(embed=embed)
