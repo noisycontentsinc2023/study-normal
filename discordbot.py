@@ -161,8 +161,8 @@ async def event(ctx):
         class2_url = bs.select_one('#content > div > div > div > div > section.elementor-section.elementor-top-section.elementor-element.elementor-element-74bbde4.elementor-section-stretched.elementor-section-boxed.elementor-section-height-default.elementor-section-height-default > div > div > div > div > div > section > div > div > div.elementor-column.elementor-col-50.elementor-inner-column.elementor-element.elementor-element-9b8ac8e > div > div > div.elementor-element.elementor-element-22259e8.elementor-align-center.elementor-widget.elementor-widget-button > div > div > a')['href']
 
         embed = discord.Embed(title="현재 진행중인 클래스", description="자세한 내용은 홈페이지를 참고해주세요 http://studymini.com/class", color=0x62c1cc)
-        embed.add_field(name="일본어 클래스", value=f"{class1}\n [자세히 보기]({class1_url})", inline=True)     
-        embed.add_field(name="프랑스어 클래스", value=f"{class2}\n [자세히 보기]({class2_url})", inline=True)     
+        embed.add_field(name="일본어", value=f"{class1}\n [자세히 보기]({class1_url})", inline=True)     
+        embed.add_field(name="프랑스어", value=f"{class2}\n [자세히 보기]({class2_url})", inline=True)     
             
         await ctx.send(embed=embed)
 
