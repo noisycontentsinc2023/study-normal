@@ -261,9 +261,8 @@ async def vote(ctx, *, args):
                 await poll_message.add_reaction(emoji_list[i])
 
             # Save poll information
-            poll_info = {'title': title, 'options': options, 'votes': {}, 'closed': False}
+            poll_info = {'title': title, 'options': options, 'votes': {}, 'closed': False, 'message_id': poll_message.id}  # Add message_id here
             polls[poll_message.id] = poll_info
-            
 
 @bot.event
 async def on_reaction_add(reaction, user):
