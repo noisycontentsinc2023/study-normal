@@ -413,10 +413,15 @@ async def on_reaction_add(reaction, user):
         return
 
     if reaction.emoji in country_flags.values():
+        role_id = 1076005878290989097
+        role = discord.utils.get(user.guild.roles, id=role_id)
+
         if user.id not in selected_flags[reaction.emoji]:
             selected_flags[reaction.emoji].append(user.id)
+            await user.add_roles(role)
         else:
             selected_flags[reaction.emoji].remove(user.id)
+            await user.remove_roles(role)
 
         embed = discord.Embed(title="Select your country")
         embed = await update_embed(embed)
