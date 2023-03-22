@@ -378,7 +378,56 @@ async def close_poll(ctx, poll_id: str):
 
     # Send result message as an embed
     await ctx.send(embed=embed)
+
+#------------------------------------------------말하기------------------------------------------------------# 
     
+@bot.command(name='말하기')
+async def speak(ctx):
+    embed = discord.Embed(title="Choose your country", description="Please choose your country below:", color=0x00ff00)
+    embed.add_field(name="France", value="React with 🇫🇷", inline=True)
+    embed.add_field(name="Spain", value="React with 🇪🇸", inline=True)
+    embed.add_field(name="USA", value="React with 🇺🇸", inline=True)
+    embed.add_field(name="China", value="React with 🇨🇳", inline=True)
+    embed.add_field(name="Japan", value="React with 🇯🇵", inline=True)
+    embed.add_field(name="Germany", value="React with 🇩🇪", inline=True)
+
+    message = await ctx.send(embed=embed)
+    for emoji in ['🇫🇷', '🇪🇸', '🇺🇸', '🇨🇳', '🇯🇵', '🇩🇪']:
+        await message.add_reaction(emoji)
+
+    def check(reaction, user):
+        return user == ctx.message.author and str(reaction.emoji) in ['🇫🇷', '🇪🇸', '🇺🇸', '🇨🇳', '🇯🇵', '🇩🇪']
+
+    try:
+        reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+    except asyncio.TimeoutError:
+        await ctx.send("Timed out")
+    else:
+        country = ""
+        if reaction.emoji == '🇫🇷':
+            country = "France"
+        elif reaction.emoji == '🇪🇸':
+            country = "Spain"
+        elif reaction.emoji == '🇺🇸':
+            country = "USA"
+        elif reaction.emoji == '🇨🇳':
+            country = "China"
+        elif reaction.emoji == '🇯🇵':
+            country = "Japan"
+        elif reaction.emoji == '🇩🇪':
+            country = "Germany"
+
+        user_mention = user.mention
+
+        embed = discord.Embed(title="Country Selection", description=f"{user_mention} has selected {country}", color=0x00ff00)
+        embed.add_field(name="France", value="🇫🇷", inline=True)
+        embed.add_field(name="Spain", value="🇪🇸", inline=True)
+        embed.add_field(name="USA", value="🇺🇸", inline=True)
+        embed.add_field(name="China", value="🇨🇳", inline=True)
+        embed.add_field(name="Japan", value="🇯🇵", inline=True)
+        embed.add_field(name="Germany", value="🇩🇪", inline=True)
+
+        await message.edit(embed=embed)
 #Run the bot
 bot.run(TOKEN)
 
