@@ -242,9 +242,12 @@ async def vote(ctx, *, args):
 
             s = ''
             emoji = iter(emoji_list)
+            unicode_options = []  # New list for storing Unicode representation of options
             for option in options:
                 try:
-                    s += f'{next(emoji)} {option}\n'
+                    current_emoji = next(emoji)                    
+                    s += f'{current_emoji} {option}\n'
+                    unicode_options.append(current_emoji)
                 except StopIteration:
                     await ctx.send('Maximum of 9 options allowed.')
                     return
@@ -261,9 +264,9 @@ async def vote(ctx, *, args):
                 await poll_message.add_reaction(emoji_list[i])
 
             # Save poll information
-            poll_info = {'title': title, 'options': options, 'votes': {}, 'closed': False, 'message_id': poll_message.id}  # Add message_id here
+            poll_info = {'title': title, 'options': unicode_options, 'votes': {}, 'closed': False, 'message_id': poll_message.id} # Use unicode_options instead of options
             polls[poll_message.id] = poll_info
-
+            
 @bot.event
 async def on_reaction_add(reaction, user):
     # Check if the reaction is for a poll message
