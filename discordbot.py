@@ -395,7 +395,7 @@ selected_flags = {flag: [] for flag in country_flags.values()}
 async def update_embed(embed: discord.Embed) -> None:
     for country, flag in country_flags.items():
         users = ", ".join([f"<@{user_id}>" for user_id in selected_flags[flag]]) or "None"
-        embed.add_field(name=f"{flag} {country}", value=f"참여자: {users}", inline=True)
+        embed.add_field(name=f"{flag} {country}", value=f"Selected by: {users}", inline=True)
     return embed
 
 @bot.command(name='말하기')
