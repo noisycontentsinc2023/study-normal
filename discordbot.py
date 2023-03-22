@@ -416,12 +416,12 @@ async def speak(ctx):
                 country_emojis[country_emoji].append(user.mention)
 
             embed = discord.Embed(title="Choose your country", description="Please choose your country below:", color=0x00ff00)
-            embed.add_field(value=f"{', '.join(country_emojis['🇫🇷'])} 🇫🇷", inline=True)
-            embed.add_field(value=f"{', '.join(country_emojis['🇪🇸'])} 🇪🇸", inline=True)
-            embed.add_field(value=f"{', '.join(country_emojis['🇺🇸'])} 🇺🇸", inline=True)
-            embed.add_field(value=f"{', '.join(country_emojis['🇨🇳'])} 🇨🇳", inline=True)
-            embed.add_field(value=f"{', '.join(country_emojis['🇯🇵'])} 🇯🇵", inline=True)
-            embed.add_field(value=f"{', '.join(country_emojis['🇩🇪'])} 🇩🇪", inline=True)
+            embed.add_field(name="프랑스어", value=f"{', '.join(country_emojis['🇫🇷'])} 🇫🇷", inline=True)
+            embed.add_field(name="스페인어", value=f"{', '.join(country_emojis['🇪🇸'])} 🇪🇸", inline=True)
+            embed.add_field(name="영어", value=f"{', '.join(country_emojis['🇺🇸'])} 🇺🇸", inline=True)
+            embed.add_field(name="중국어", value=f"{', '.join(country_emojis['🇨🇳'])} 🇨🇳", inline=True)
+            embed.add_field(name="일본어", value=f"{', '.join(country_emojis['🇯🇵'])} 🇯🇵", inline=True)
+            embed.add_field(name="독일어", value=f"{', '.join(country_emojis['🇩🇪'])} 🇩🇪", inline=True)
             
 #Run the bot
 bot.run(TOKEN)
