@@ -161,7 +161,7 @@ async def event(ctx):
 
         embed = discord.Embed(title="현재 진행중인 클래스", description="자세한 내용은 홈페이지를 참고해주세요 http://studymini.com/class", color=0x62c1cc)
         embed.set_image(url=classimg_url)
-        embed.add_field(name="클래스 1", value=f"{class1}}\n [자세히 보기]({class1_url})", inline=True)     
+        embed.add_field(name="클래스 1", value=f"{class1}\n [자세히 보기]({class1_url})", inline=True)     
             
         await ctx.send(embed=embed)
 
