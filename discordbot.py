@@ -380,54 +380,7 @@ async def close_poll(ctx, poll_id: str):
     await ctx.send(embed=embed)
 
 #------------------------------------------------말하기------------------------------------------------------# 
-    
-country_flags = {
-    "스페인어": "🇪🇸",
-    "영어": "🇺🇸",
-    "일본어": "🇯🇵",
-    "중국어": "🇨🇳",
-    "프랑스어": "🇫🇷",
-    "독일어": "🇩🇪",
-}
 
-selected_flags = {flag: [] for flag in country_flags.values()}
-
-async def update_embed(embed: discord.Embed) -> None:
-    for country, flag in country_flags.items():
-        users = ", ".join([f"<@{user_id}>" for user_id in selected_flags[flag]]) or "None"
-        embed.add_field(name=f"{flag} {country}", value=f"현재 참여자: {users}", inline=True)
-    return embed
-
-@bot.command(name='말하기')
-async def speak(ctx):
-    embed = discord.Embed(title="참여할 스터디의 국기를 클릭해주세요")
-    embed = await update_embed(embed)
-
-    message = await ctx.send(embed=embed)
-    for flag in country_flags.values():
-        await message.add_reaction(flag)
-
-@bot.event
-async def on_reaction_add(reaction, user):
-    if user == bot.user:
-        return
-
-    if reaction.emoji in country_flags.values():
-        role_id = 1076005878290989097
-        role = discord.utils.get(user.guild.roles, id=role_id)
-
-        if user.id not in selected_flags[reaction.emoji]:
-            selected_flags[reaction.emoji].append(user.id)
-            await user.add_roles(role)
-        else:
-            selected_flags[reaction.emoji].remove(user.id)
-            await user.remove_roles(role)
-
-        embed = discord.Embed(title="함여할 스터디의 국기를 클릭해주세요")
-        embed = await update_embed(embed)
-
-        await reaction.message.edit(embed=embed)
-        await reaction.remove(user)
             
 #Run the bot
 bot.run(TOKEN)
