@@ -288,7 +288,12 @@ async def on_reaction_add(reaction, user):
     # Check if the reaction is for a valid option
     emoji = get_emoji(reaction.emoji)
     poll_data = polls[poll_id]
-    if emoji not in poll_data['options']:
+    option_index = -1
+    for i, option in enumerate(poll_data['options']):
+        if emoji == option:
+            option_index = i
+            break
+    if option_index == -1:
         print(f"User {user.name} reacted with invalid emoji {emoji} for poll {poll_data['title']} ({poll_id})")
         return
 
