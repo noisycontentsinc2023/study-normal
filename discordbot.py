@@ -159,9 +159,9 @@ async def event(ctx):
         class11_url = bs.select_one('#content > div > div > div > div > section.elementor-section.elementor-top-section.elementor-element.elementor-element-74bbde4.elementor-section-stretched.elementor-section-boxed.elementor-section-height-default.elementor-section-height-default > div > div > div > div > div > section > div > div > div.elementor-column.elementor-col-50.elementor-inner-column.elementor-element.elementor-element-22ec587 > div > div > div.elementor-element.elementor-element-121a28d.elementor-widget.elementor-widget-image > div > div > img')['src']
         class1_url = bs.select_one('#content > div > div > div > div > section.elementor-section.elementor-top-section.elementor-element.elementor-element-74bbde4.elementor-section-stretched.elementor-section-boxed.elementor-section-height-default.elementor-section-height-default > div > div > div > div > div > section > div > div > div.elementor-column.elementor-col-50.elementor-inner-column.elementor-element.elementor-element-22ec587 > div > div > div.elementor-element.elementor-element-1d60365.elementor-align-center.elementor-widget.elementor-widget-button > div > div > a')['href']
 
-        embed = discord.Embed(title="현재 진행중인 클래스", description="자", color=0x62c1cc)
+        embed = discord.Embed(title="현재 진행중인 클래스", description="자세한 내용은 홈페이지를 참고해주세요 http://studymini.com/class", color=0x62c1cc)
         embed.set_image(url=class11_url)
-        embed.add_field(name="클래스 1", value=f"{class1}\n [자세히 보기]({class1_url})", inline=True페이지를 참고해주세요 http://studymini.com/class", color=0x62c1cc)
+        embed.add_field(name="클래스 1", value=f"{class1}\n [자세히 보기]({class1_url})", inline=True)
         embed.add_field(name="클래스 1", value=f"{class1}\n\u200c{class11}\n [자세히 보기]({class1_url})", inline=True)     
             
         await ctx.send(embed=embed)
