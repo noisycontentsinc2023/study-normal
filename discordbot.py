@@ -400,7 +400,7 @@ async def update_embed(embed: discord.Embed) -> None:
 
 @bot.command(name='말하기')
 async def speak(ctx):
-    embed = discord.Embed(title="여할 스터디의 국기를 클릭해주세요")
+    embed = discord.Embed(title="참여할 스터디의 국기를 클릭해주세요")
     embed = await update_embed(embed)
 
     message = await ctx.send(embed=embed)
