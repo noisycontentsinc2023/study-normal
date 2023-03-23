@@ -337,7 +337,67 @@ async def close_poll(ctx, poll_id: str):
     await ctx.send(embed=embed)
 
 #------------------------------------------------말하기------------------------------------------------------# 
+intents.typing = False
+intents.presences = False
 
+class CustomView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.user_mentions = {}
+
+    def add_button(self, button):
+        self.add_item(button)
+        self.user_mentions[button.custom_id] = []
+        
+class ButtonClick(discord.ui.Button):
+    def __init__(self, label, view):
+        super().__init__(label=label, custom_id=label)
+        self.parent_view = view
+
+    async def callback(self, interaction: discord.Interaction):
+        view = self.parent_view
+        user = interaction.user
+        user_mentions = view.user_mentions[self.custom_id]
+        guild = interaction.guild
+        role_id = 1076005878290989097
+        role = guild.get_role(role_id)
+
+        if not role:
+            await interaction.response.send_message("Role not found. Please check if the role ID is correct.", ephemeral=True)
+            return
+
+        if user in user_mentions:
+            user_mentions.remove(user)
+            await interaction.user.remove_roles(role)
+        else:
+            user_mentions.append(user)
+            await interaction.user.add_roles(role)
+
+        embed = discord.Embed(title="말하기 스터디 참여 현황")
+        for button in view.children:
+            mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
+            embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
+        await interaction.response.edit_message(embed=embed)
+        
+@bot.command(name='말하기')
+async def speak(ctx):
+    view = CustomView()
+    buttons = [
+        ButtonClick("스페인어", view),
+        ButtonClick("중국어", view),
+        ButtonClick("일본어", view),
+        ButtonClick("영어", view),
+        ButtonClick("프랑스어", view),
+        ButtonClick("독일어", view),
+    ]
+
+    for button in buttons:
+        view.add_button(button)
+
+    embed = discord.Embed(title="말하기 스터디 참여 현황")
+    for button in buttons:
+        embed.add_field(name=button.label, value="아직 참여자가 없어요 :(", inline=True)
+    await ctx.send(embed=embed, view=view)
             
 #Run the bot
 bot.run(TOKEN)
