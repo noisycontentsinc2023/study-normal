@@ -342,9 +342,9 @@ intents.presences = False
 
 class CustomView(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.user_mentions = {}
-
+       
     def add_button(self, button):
         self.add_item(button)
         self.user_mentions[button.custom_id] = []
