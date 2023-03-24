@@ -155,6 +155,36 @@ async def search(ctx, *args):
       await ctx.send(f"검색결과가 없습니다 \"{query}\".")
   else:
     await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
+    
+@bot.command(name='이미지')
+async def search_image(ctx, *args):
+    query = ' '.join(args)
+    search_url = f'https://openapi.naver.com/v1/search/image?query={query}'
+
+    headers = {
+        'X-Naver-Client-Id': 'your_client_id',
+        'X-Naver-Client-Secret': 'your_client_secret'
+    }
+
+    response = requests.get(search_url, headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+
+        if len(data['items']) > 0:
+            # Extract the top search result
+            top_result = data['items'][0]
+
+            # Format the search result as an embedded message
+            embed = discord.Embed(title=f"Search Results for \"{query}\"", color=0x0099ff)
+            embed.set_image(url=top_result['link'])
+            embed.add_field(name=top_result['title'], value=top_result['link'], inline=False)
+
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f"No search results for \"{query}\".")
+    else:
+        await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
 
 #------------------------------------------------투표------------------------------------------------------#  
 def get_emoji(emoji):
