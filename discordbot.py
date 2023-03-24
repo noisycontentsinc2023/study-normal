@@ -373,22 +373,43 @@ async def close_poll(ctx, poll_id: str):
 intents.messages = True
 
 sticky_messages = {}
-
+sticky_message_ids = {}
 
 @bot.command(name='고정')
 async def sticky(ctx, *, message):
     global sticky_messages
+    global sticky_message_ids
+
+    if ctx.channel.id in sticky_messages:
+        old_message_id = sticky_message_ids[ctx.channel.id]
+        try:
+            old_message = await ctx.channel.fetch_message(old_message_id)
+            await old_message.delete()
+        except discord.NotFound:
+            pass
+
     sticky_messages[ctx.channel.id] = message
-    await ctx.send(f'메시지가 고정됐어요!')
+    new_message = await ctx.send(f'Sticky message set in this channel!')
+    sticky_message_ids[ctx.channel.id] = new_message.id
 
 @bot.command(name='해제')
 async def unsticky(ctx):
     global sticky_messages
+    global sticky_message_ids
     if ctx.channel.id in sticky_messages:
         del sticky_messages[ctx.channel.id]
+
+        old_message_id = sticky_message_ids[ctx.channel.id]
+        try:
+            old_message = await ctx.channel.fetch_message(old_message_id)
+            await old_message.delete()
+        except discord.NotFound:
+            pass
+
+        del sticky_message_ids[ctx.channel.id]
         await ctx.send('Sticky message removed.')
     else:
-        await ctx.send('고정된 메시지가 없습니다')
+        await ctx.send('No sticky message found in this channel.')
 
 @bot.event
 async def on_message(message):
@@ -398,7 +419,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
     global sticky_messages
-    if message.channel.id in sticky_messages:
+    if message.channel.id in sticky_messages and message.id != sticky_message_ids[message.channel.id]:
         await message.channel.send(sticky_messages[message.channel.id])
 
 #Run the bot
