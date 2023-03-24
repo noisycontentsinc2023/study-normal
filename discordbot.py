@@ -173,7 +173,7 @@ async def search_image(ctx, *args):
 
         if len(data['items']) > 0:
             # Extract the top search result
-            top_result = data['items'][:2]
+            results = data['items'][:2]
 
             # Format the search result as an embedded message
             embed = discord.Embed(title=f"Search Results for \"{query}\"", color=0x0099ff)
