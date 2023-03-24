@@ -454,37 +454,6 @@ async def get_speak_embed(user_mentions_instance):
             
 #------------------------------------------------고정------------------------------------------------------# 
 
-intents = discord.Intents.default()
-intents.messages = True
-
-sticky_messages = {}
-
-@bot.command(name='고정')
-async def sticky(ctx, *, message):
-    global sticky_messages
-    sticky_messages[ctx.channel.id] = message
-    await ctx.send(f'메시지가 정상적으로 고정되었습니다')
-
-@bot.command(name='해제')
-async def unsticky(ctx):
-    global sticky_messages
-    if ctx.channel.id in sticky_messages:
-        del sticky_messages[ctx.channel.id]
-        await ctx.send('고정 메시지가 삭제됐어요')
-    else:
-        await ctx.send('고정 메시지가 없습니다')
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    await bot.process_commands(message)
-
-    global sticky_messages
-    if message.channel.id in sticky_messages:
-        await message.channel.send(sticky_messages[message.channel.id])
-
 #Run the bot
 bot.run(TOKEN)
 
