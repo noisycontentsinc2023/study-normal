@@ -391,7 +391,12 @@ class UserMentions:
         async with aiofiles.open("user_mentions.json", "w") as f:
             await f.write(json.dumps(data))
 
-user_mentions_instance = UserMentions(bot)
+user_mentions_instance = None
+
+async def setup():
+    global user_mentions_instance
+    user_mentions_instance = UserMentions(bot)
+    await user_mentions_instance.load_user_mentions()
 
 class CustomView(discord.ui.View):
     def __init__(self, user_mentions=None):
@@ -435,6 +440,9 @@ class ButtonClick(discord.ui.Button):
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
         await interaction.response.edit_message(embed=embed)
 
+@bot.event
+async def on_ready():
+    user_mentions_instance = UserMentions(bot)
         
 @bot.command(name='말하기')
 async def speak(ctx):
