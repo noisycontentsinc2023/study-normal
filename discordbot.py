@@ -385,6 +385,8 @@ class CustomView(discord.ui.View):
 
 async def load_user_mentions():
     global global_user_mentions
+    if global_user_mentions is not None:  # Add this line to prevent reloading if data is already loaded
+        return
     try:
         async with aiofiles.open("user_mentions.json", "r") as f:
             data = await f.read()
@@ -441,7 +443,7 @@ async def speak(ctx):
     
 async def display_speak(ctx):
     global global_user_mentions
-    await load_user_mentions()
+    # Remove the await load_user_mentions() line
     user_mentions = global_user_mentions
     view = CustomView(user_mentions)
     buttons = [
