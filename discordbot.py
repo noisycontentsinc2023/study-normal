@@ -392,7 +392,7 @@ class UserMentions:
         data = {k: [user.id for user in v] for k, v in self.user_mentions.items()}
         async with aiofiles.open("user_mentions.json", "w") as f:
             await f.write(json.dumps(data))
-
+            
 user_mentions_instance = None
 
 async def setup():
@@ -441,7 +441,7 @@ class ButtonClick(discord.ui.Button):
             mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
         await interaction.response.edit_message(embed=embed)
-
+        
 @bot.event
 async def on_ready():
     global user_mentions_instance
