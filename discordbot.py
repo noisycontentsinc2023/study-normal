@@ -374,24 +374,21 @@ intents.messages = True
 
 sticky_messages = {}
 
-@bot.event
-async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
 
-@bot.command(name='fixed')
+@bot.command(name='고정')
 async def sticky(ctx, *, message):
     global sticky_messages
     sticky_messages[ctx.channel.id] = message
-    await ctx.send(f'Sticky message set in this channel!')
+    await ctx.send(f'메시지가 고정됐어요!')
 
-@bot.command(name='disable')
+@bot.command(name='해제')
 async def unsticky(ctx):
     global sticky_messages
     if ctx.channel.id in sticky_messages:
         del sticky_messages[ctx.channel.id]
         await ctx.send('Sticky message removed.')
     else:
-        await ctx.send('No sticky message found in this channel.')
+        await ctx.send('고정된 메시지가 없습니다')
 
 @bot.event
 async def on_message(message):
