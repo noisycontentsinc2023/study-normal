@@ -440,7 +440,8 @@ async def speak(ctx):
     await display_speak(ctx)
     
 async def display_speak(ctx):
-    user_mentions = await load_user_mentions()
+    global global_user_mentions
+    user_mentions = global_user_mentions
     view = CustomView(user_mentions)
     buttons = [
         ButtonClick("스페인어", view),
