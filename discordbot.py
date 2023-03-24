@@ -161,7 +161,7 @@ async def search_image(ctx, *args):
     query = ' '.join(args)
     search_url = f'https://openapi.naver.com/v1/search/image?query={query}'
 
-      headers = {
+    headers = {
     'X-Naver-Client-Id': 'iuWr9aAAyKxNnRsRSQIt' ,
     'X-Naver-Client-Secret': 'bkfPugeyIa'
     }
