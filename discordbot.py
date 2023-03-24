@@ -412,7 +412,11 @@ async def setup():
     user_mentions_instance = UserMentions(bot)
     await user_mentions_instance.load_user_mentions()
 
-bot.add_listener(user_mentions_instance.on_shutdown, "on_shutdown")
+async def on_shutdown():
+    await user_mentions_instance.save_user_mentions()
+    await bot.close()
+
+bot.add_listener(on_shutdown, 'on_shutdown')
 
 class CustomView(discord.ui.View):
     def __init__(self, user_mentions=None):
