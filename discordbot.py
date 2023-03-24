@@ -12,6 +12,7 @@ import datetime
 import uuid
 import string
 import aiofiles
+import json
 
 from bs4 import BeautifulSoup
 from discord import Embed
@@ -388,7 +389,7 @@ async def load_user_mentions():
             return {k: [await bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
-    
+
 async def save_user_mentions(user_mentions):
     data = {k: [user.id for user in v] for k, v in user_mentions.items()}
     async with aiofiles.open("user_mentions.json", "w") as f:
