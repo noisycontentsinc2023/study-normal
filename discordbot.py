@@ -452,6 +452,10 @@ async def speak(ctx):
     await display_speak(ctx)
     
 async def display_speak(ctx):
+    if user_mentions_instance is None:
+        await ctx.send("User mentions not loaded yet. Please wait a moment and try again.")
+        return
+
     user_mentions = user_mentions_instance.user_mentions
     view = CustomView(user_mentions)
     buttons = [
