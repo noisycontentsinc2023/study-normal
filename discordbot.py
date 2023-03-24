@@ -376,12 +376,12 @@ class CustomView(discord.ui.View):
     def __init__(self, user_mentions=None):
         super().__init__(timeout=None)
         self.user_mentions = user_mentions or {}
-       
+
     def add_button(self, button):
         self.add_item(button)
         if button.custom_id not in self.user_mentions:
             self.user_mentions[button.custom_id] = []
-        
+
 async def load_user_mentions():
     try:
         async with aiofiles.open("user_mentions.json", "r") as f:
@@ -395,7 +395,7 @@ async def save_user_mentions(user_mentions):
     data = {k: [user.id for user in v] for k, v in user_mentions.items()}
     async with aiofiles.open("user_mentions.json", "w") as f:
         await f.write(json.dumps(data))
-        
+
 class ButtonClick(discord.ui.Button):
     def __init__(self, label, view):
         super().__init__(label=label, custom_id=label)
@@ -420,15 +420,17 @@ class ButtonClick(discord.ui.Button):
             user_mentions.append(user)
             await interaction.user.add_roles(role)
 
+        await save_user_mentions(view.user_mentions)
+
         embed = discord.Embed(title="말하기 스터디 참여 현황")
         for button in view.children:
             mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
         await interaction.response.edit_message(embed=embed)
+
         
 @bot.command(name='말하기')
-async def speak(ctx):
-    user_mentions = await load_user_mentions()
+user_mentions = await load_user_mentions()
     view = CustomView(user_mentions)
     buttons = [
         ButtonClick("스페인어", view),
@@ -444,7 +446,8 @@ async def speak(ctx):
 
     embed = discord.Embed(title="말하기 스터디 참여 현황")
     for button in buttons:
-        embed.add_field(name=button.label, value="아직 참여자가 없어요 :(", inline=True)
+        mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
+        embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
     await ctx.send(embed=embed, view=view)
             
 #Run the bot
