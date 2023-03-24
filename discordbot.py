@@ -441,6 +441,7 @@ async def speak(ctx):
     
 async def display_speak(ctx):
     global global_user_mentions
+    await load_user_mentions()
     user_mentions = global_user_mentions
     view = CustomView(user_mentions)
     buttons = [
