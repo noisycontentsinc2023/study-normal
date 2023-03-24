@@ -378,13 +378,15 @@ class UserMentions:
         self.bot.loop.create_task(self.load_user_mentions())
 
     async def load_user_mentions(self):
-        try:
-            async with aiofiles.open("user_mentions.json", "r") as f:
-                data = await f.read()
-                user_mentions = json.loads(data)
-                self.user_mentions = {k: [await self.bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.user_mentions = {}
+    print("Loading user mentions...")
+    try:
+        async with aiofiles.open("user_mentions.json", "r") as f:
+            data = await f.read()
+            user_mentions = json.loads(data)
+            self.user_mentions = {k: [await self.bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
+    except (FileNotFoundError, json.JSONDecodeError):
+        self.user_mentions = {}
+    print("User mentions loaded:", self.user_mentions)
 
     async def save_user_mentions(self):
         data = {k: [user.id for user in v] for k, v in self.user_mentions.items()}
@@ -446,6 +448,7 @@ async def on_ready():
         
 @bot.command(name='말하기')
 async def speak(ctx):
+    print(user_mentions_instance)  # check if user_mentions_instance has been initialized
     await display_speak(ctx)
     
 async def display_speak(ctx):
