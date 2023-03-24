@@ -378,15 +378,18 @@ class UserMentions:
         self.bot.loop.create_task(self.load_user_mentions())
 
     async def load_user_mentions(self):
-        print("Loading user mentions")
-        try:
-            async with aiofiles.open("user_mentions.json", "r") as f:
-                data = await f.read()
-                user_mentions = json.loads(data)
-                self.user_mentions = {k: [await self.bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
-        except (FileNotFoundError, json.JSONDecodeError):
+    print("Loading user mentions...")
+    try:
+        async with aiofiles.open("user_mentions.json", "r") as f:
+            data = await f.read()
+            print("JSON data:", data)
+            user_mentions = json.loads(data)
+            print("Parsed user mentions:", user_mentions)
+            self.user_mentions = {k: [await self.bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
+        except (FileNotFoundError, json.JSONDecodeError) as e:
             self.user_mentions = {}
-        print("User mentions loaded:", self.user_mentions)
+            print("Exception:", e)
+    print("User mentions loaded:", self.user_mentions)
 
     async def save_user_mentions(self):
         data = {k: [user.id for user in v] for k, v in self.user_mentions.items()}
