@@ -385,16 +385,16 @@ async def on_ready():
 async def sticky(ctx, *, message):
     global sticky_messages
     sticky_messages[ctx.channel.id] = message
-    await ctx.send(f'Sticky message set in this channel!')
+    await ctx.send(f'메시지가 고정됐습니다!')
 
 @bot.command(name='해제')
 async def unsticky(ctx):
     global sticky_messages
     if ctx.channel.id in sticky_messages:
         del sticky_messages[ctx.channel.id]
-        await ctx.send('Sticky message removed.')
+        await ctx.send('고정이 해제됐어요!')
     else:
-        await ctx.send('No sticky message found in this channel.')
+        await ctx.send('이 채널에는 고정된 메시지가 없어요')
 
 @bot.event
 async def on_message(message):
