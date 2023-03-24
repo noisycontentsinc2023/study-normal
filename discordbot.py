@@ -444,7 +444,9 @@ class ButtonClick(discord.ui.Button):
 
 @bot.event
 async def on_ready():
+    global user_mentions_instance
     user_mentions_instance = UserMentions(bot)
+    await user_mentions_instance.load_user_mentions()
         
 @bot.command(name='말하기')
 async def speak(ctx):
