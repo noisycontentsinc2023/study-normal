@@ -378,7 +378,7 @@ class UserMentions:
         self.bot.loop.create_task(self.load_user_mentions())
 
     async def load_user_mentions(self):
-        print("Loading user mentions...")
+        print("Loading user mentions")
         try:
             async with aiofiles.open("user_mentions.json", "r") as f:
                 data = await f.read()
