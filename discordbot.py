@@ -368,6 +368,7 @@ async def close_poll(ctx, poll_id: str):
     await ctx.send(embed=embed)
 
 #------------------------------------------------말하기------------------------------------------------------# 
+intents = discord.Intents.default()
 intents.typing = False
 intents.presences = False
 
@@ -375,35 +376,40 @@ class UserMentions:
     def __init__(self, bot):
         self.bot = bot
         self.user_mentions = None
+        self.message_id = None
         self.bot.loop.create_task(self.load_user_mentions())
 
     async def load_user_mentions(self):
-        print("Loading user mentions")
+        print("Loading user mentions...")
         try:
             async with aiofiles.open("user_mentions.json", "r") as f:
                 data = await f.read()
                 user_mentions = json.loads(data)
-                self.user_mentions = {
-                    int(k): [
-                        await self.bot.fetch_user(int(user_id))
-                        for user_id in v
-                    ]
-                    for k, v in user_mentions.items()
-                }
+                self.user_mentions = {k: [await self.bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
         except (FileNotFoundError, json.JSONDecodeError):
             self.user_mentions = {}
         print("User mentions loaded:", self.user_mentions)
 
     async def save_user_mentions(self):
-        data = {
-            str(k): [user.id for user in v]
-            for k, v in self.user_mentions.items()
-        }
+        data = {k: [user.id for user in v] for k, v in self.user_mentions.items()}
         async with aiofiles.open("user_mentions.json", "w") as f:
             await f.write(json.dumps(data))
 
-    async def on_shutdown(self):
-        await self.save_user_mentions()
+    async def save_message_id(self, message_id):
+        self.message_id = message_id
+        async with aiofiles.open("message_id.json", "w") as f:
+            await f.write(json.dumps({"message_id": message_id}))
+
+    async def load_message_id(self):
+        try:
+            async with aiofiles.open("message_id.json", "r") as f:
+                data = await f.read()
+                message_id = json.loads(data)["message_id"]
+                self.message_id = message_id
+                return message_id
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+        return None
 
 user_mentions_instance = None
 
@@ -411,67 +417,15 @@ async def setup():
     global user_mentions_instance
     user_mentions_instance = UserMentions(bot)
     await user_mentions_instance.load_user_mentions()
+    message_id = await user_mentions_instance.load_message_id()
+    if message_id:
+        try:
+            message = await bot.get_channel(channel_id).fetch_message(message_id)
+            await message.edit(embed=await get_speak_embed(user_mentions_instance))
+        except discord.errors.NotFound:
+            pass
 
-async def on_shutdown():
-    await user_mentions_instance.save_user_mentions()
-    await bot.close()
-
-bot.add_listener(on_shutdown, 'on_shutdown')
-
-class CustomView(discord.ui.View):
-    def __init__(self, user_mentions=None):
-        super().__init__(timeout=None)
-        self.user_mentions = user_mentions or {}
-
-    def add_button(self, button):
-        self.add_item(button)
-        if button.custom_id not in self.user_mentions:
-            self.user_mentions[button.custom_id] = []
-
-class ButtonClick(discord.ui.Button):
-    def __init__(self, label, view):
-        super().__init__(label=label, custom_id=label)
-        self.parent_view = view
-
-    async def callback(self, interaction: discord.Interaction):
-        view = self.parent_view
-        user = interaction.user
-        user_mentions = view.user_mentions[self.custom_id]
-        guild = interaction.guild
-        role_id = 1076005878290989097
-        role = guild.get_role(role_id)
-
-        if not role:
-            await interaction.response.send_message("Role not found. Please check if the role ID is correct.", ephemeral=True)
-            return
-
-        if user in user_mentions:
-            user_mentions.remove(user)
-            await interaction.user.remove_roles(role)
-        else:
-            user_mentions.append(user)
-            await interaction.user.add_roles(role)
-
-        await user_mentions_instance.save_user_mentions()
-
-        embed = discord.Embed(title="말하기 스터디 참여 현황")
-        for button in view.children:
-            mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
-            embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
-        await interaction.response.edit_message(embed=embed)
-        
-@bot.event
-async def on_ready():
-    global user_mentions_instance
-    user_mentions_instance = UserMentions(bot)
-    await user_mentions_instance.load_user_mentions()
-        
-@bot.command(name='말하기')
-async def speak(ctx):
-    print(user_mentions_instance)  # check if user_mentions_instance has been initialized
-    await display_speak(ctx)
-    
-async def display_speak(ctx):
+async def get_speak_embed(user_mentions_instance):
     user_mentions = user_mentions_instance.user_mentions
     view = CustomView(user_mentions)
     buttons = [
@@ -490,7 +444,13 @@ async def display_speak(ctx):
     for button in buttons:
         mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
         embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
-    await ctx.send(embed=embed, view=view)
+
+    message_id = None
+    if user_mentions_instance.message_id:
+        try:
+            message = await bot.get_channel(channel_id).fetch_message(user_mentions_instance.message_id)
+            await message.edit(embed=embed, view=view)
+            message_id = user_mentions_instance.message
             
 #------------------------------------------------고정------------------------------------------------------# 
 
