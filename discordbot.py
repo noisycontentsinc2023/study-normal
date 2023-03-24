@@ -425,7 +425,7 @@ class ButtonClick(discord.ui.Button):
         embed = discord.Embed(title="말하기 스터디 참여 현황")
         for button in view.children:
             mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
-            embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
+            embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
         await interaction.response.edit_message(embed=embed)
 
         
@@ -451,7 +451,7 @@ async def display_speak(ctx):
     embed = discord.Embed(title="말하기 스터디 참여 현황")
     for button in buttons:
         mentions_str = " ".join([f"{user.mention}" for user in view.user_mentions[button.custom_id]])
-        embed.add_field(name=button.label, value=mentions_str if mentions_str else "No one has clicked yet!", inline=True)
+        embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
     await ctx.send(embed=embed, view=view)
             
 #Run the bot
