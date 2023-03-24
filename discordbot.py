@@ -379,7 +379,8 @@ class CustomView(discord.ui.View):
        
     def add_button(self, button):
         self.add_item(button)
-        self.user_mentions[button.custom_id] = []
+        if button.custom_id not in self.user_mentions:
+            self.user_mentions[button.custom_id] = []
         
 async def load_user_mentions():
     try:
