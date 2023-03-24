@@ -454,7 +454,7 @@ async def get_speak_embed(user_mentions_instance):
             
 #------------------------------------------------고정------------------------------------------------------# 
 
-stichy_message = None
+sticy_message = None
 sticky_channel = None
 
 sticky_messages = {}
