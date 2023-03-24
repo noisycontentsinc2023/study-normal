@@ -11,6 +11,7 @@ import time
 import datetime
 import uuid
 import string
+import aiofiles
 
 from bs4 import BeautifulSoup
 from discord import Embed
@@ -371,13 +372,27 @@ intents.typing = False
 intents.presences = False
 
 class CustomView(discord.ui.View):
-    def __init__(self):
+    def __init__(self, user_mentions=None):
         super().__init__(timeout=None)
-        self.user_mentions = {}
+        self.user_mentions = user_mentions or {}
        
     def add_button(self, button):
         self.add_item(button)
         self.user_mentions[button.custom_id] = []
+        
+async def load_user_mentions():
+    try:
+        async with aiofiles.open("user_mentions.json", "r") as f:
+            data = await f.read()
+            user_mentions = json.loads(data)
+            return {k: [await bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    
+async def save_user_mentions(user_mentions):
+    data = {k: [user.id for user in v] for k, v in user_mentions.items()}
+    async with aiofiles.open("user_mentions.json", "w") as f:
+        await f.write(json.dumps(data))
         
 class ButtonClick(discord.ui.Button):
     def __init__(self, label, view):
@@ -411,7 +426,8 @@ class ButtonClick(discord.ui.Button):
         
 @bot.command(name='말하기')
 async def speak(ctx):
-    view = CustomView()
+    user_mentions = await load_user_mentions()
+    view = CustomView(user_mentions)
     buttons = [
         ButtonClick("스페인어", view),
         ButtonClick("중국어", view),
