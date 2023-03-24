@@ -383,22 +383,36 @@ class UserMentions:
             async with aiofiles.open("user_mentions.json", "r") as f:
                 data = await f.read()
                 user_mentions = json.loads(data)
-                self.user_mentions = {k: [await self.bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
+                self.user_mentions = {
+                    int(k): [
+                        await self.bot.fetch_user(int(user_id))
+                        for user_id in v
+                    ]
+                    for k, v in user_mentions.items()
+                }
         except (FileNotFoundError, json.JSONDecodeError):
             self.user_mentions = {}
         print("User mentions loaded:", self.user_mentions)
 
     async def save_user_mentions(self):
-        data = {k: [user.id for user in v] for k, v in self.user_mentions.items()}
+        data = {
+            str(k): [user.id for user in v]
+            for k, v in self.user_mentions.items()
+        }
         async with aiofiles.open("user_mentions.json", "w") as f:
             await f.write(json.dumps(data))
-            
+
+    async def on_shutdown(self):
+        await self.save_user_mentions()
+
 user_mentions_instance = None
 
 async def setup():
     global user_mentions_instance
     user_mentions_instance = UserMentions(bot)
     await user_mentions_instance.load_user_mentions()
+
+bot.add_listener(user_mentions_instance.on_shutdown, "on_shutdown")
 
 class CustomView(discord.ui.View):
     def __init__(self, user_mentions=None):
