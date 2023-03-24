@@ -454,6 +454,41 @@ async def display_speak(ctx):
         embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
     await ctx.send(embed=embed, view=view)
             
+#------------------------------------------------고정------------------------------------------------------# 
+
+intents.messages = True
+
+stichy_message = None
+sticky_channel = None
+
+sticky_messages = {}
+
+@bot.command(name='고정')
+async def sticky(ctx, *, message):
+    global sticky_messages
+    sticky_messages[ctx.channel.id] = message
+    await ctx.send(f'Sticky message set in this channel!')
+
+@bot.command(name='해제')
+async def unsticky(ctx):
+    global sticky_messages
+    if ctx.channel.id in sticky_messages:
+        del sticky_messages[ctx.channel.id]
+        await ctx.send('Sticky message removed.')
+    else:
+        await ctx.send('No sticky message found in this channel.')
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    await bot.process_commands(message)
+
+    global sticky_messages
+    if message.channel.id in sticky_messages:
+        await message.channel.send(sticky_messages[message.channel.id])
+
 #Run the bot
 bot.run(TOKEN)
 
