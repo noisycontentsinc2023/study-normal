@@ -372,41 +372,26 @@ async def close_poll(ctx, poll_id: str):
 
 intents.messages = True
 
+
+
 sticky_messages = {}
-sticky_message_ids = {}
+last_sticky_messages = {}
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
 
 @bot.command(name='고정')
 async def sticky(ctx, *, message):
     global sticky_messages
-    global sticky_message_ids
-
-    if ctx.channel.id in sticky_messages:
-        old_message_id = sticky_message_ids[ctx.channel.id]
-        try:
-            old_message = await ctx.channel.fetch_message(old_message_id)
-            await old_message.delete()
-        except discord.NotFound:
-            pass
-
     sticky_messages[ctx.channel.id] = message
-    new_message = await ctx.send(f'Sticky message set in this channel!')
-    sticky_message_ids[ctx.channel.id] = new_message.id
+    await ctx.send(f'Sticky message set in this channel!')
 
 @bot.command(name='해제')
 async def unsticky(ctx):
     global sticky_messages
-    global sticky_message_ids
     if ctx.channel.id in sticky_messages:
         del sticky_messages[ctx.channel.id]
-
-        old_message_id = sticky_message_ids[ctx.channel.id]
-        try:
-            old_message = await ctx.channel.fetch_message(old_message_id)
-            await old_message.delete()
-        except discord.NotFound:
-            pass
-
-        del sticky_message_ids[ctx.channel.id]
         await ctx.send('Sticky message removed.')
     else:
         await ctx.send('No sticky message found in this channel.')
@@ -419,8 +404,18 @@ async def on_message(message):
     await bot.process_commands(message)
 
     global sticky_messages
-    if message.channel.id in sticky_messages and message.id != sticky_message_ids[message.channel.id]:
-        await message.channel.send(sticky_messages[message.channel.id])
+    global last_sticky_messages
+
+    if message.channel.id in sticky_messages:
+        if message.channel.id in last_sticky_messages:
+            old_message = last_sticky_messages[message.channel.id]
+            try:
+                await old_message.delete()
+            except discord.NotFound:
+                pass
+
+        new_message = await message.channel.send(sticky_messages[message.channel.id])
+        last_sticky_messages[message.channel.id] = new_message
 
 #Run the bot
 bot.run(TOKEN)
