@@ -370,6 +370,40 @@ async def close_poll(ctx, poll_id: str):
 
 #------------------------------------------------고정------------------------------------------------------# 
 
+intents.messages = True
+
+sticky_messages = {}
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+
+@bot.command(name='fixed')
+async def sticky(ctx, *, message):
+    global sticky_messages
+    sticky_messages[ctx.channel.id] = message
+    await ctx.send(f'Sticky message set in this channel!')
+
+@bot.command(name='disable')
+async def unsticky(ctx):
+    global sticky_messages
+    if ctx.channel.id in sticky_messages:
+        del sticky_messages[ctx.channel.id]
+        await ctx.send('Sticky message removed.')
+    else:
+        await ctx.send('No sticky message found in this channel.')
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    await bot.process_commands(message)
+
+    global sticky_messages
+    if message.channel.id in sticky_messages:
+        await message.channel.send(sticky_messages[message.channel.id])
+
 #Run the bot
 bot.run(TOKEN)
 
