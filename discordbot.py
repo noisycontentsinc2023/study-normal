@@ -178,15 +178,14 @@ async def search_image(ctx, *args):
             results = data['items'][:2]
 
             # Create a separate embedded message for each search result
-            for result in results:
-                embed = discord.Embed(title=result['title'], color=0x0099ff)
+            ffor result in results:
+                embed = discord.Embed(color=0x0099ff)
                 embed.set_image(url=result['thumbnail'])
-                embed.add_field(name="URL", value=result['link'], inline=False)
                 await ctx.send(embed=embed)
         else:
             await ctx.send(f"No search results for \"{query}\".")
     else:
-        await ctx.send('에러가 발생했어요! 명령어를 깜빡 하신건 아닐까요?')
+        await ctx.send('에러가 요발생했어요')
 
 #------------------------------------------------투표------------------------------------------------------#  
 def get_emoji(emoji):
