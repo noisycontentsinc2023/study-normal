@@ -372,6 +372,8 @@ async def close_poll(ctx, poll_id: str):
 intents.typing = False
 intents.presences = False
 
+global_user_mentions = None
+
 class CustomView(discord.ui.View):
     def __init__(self, user_mentions=None):
         super().__init__(timeout=None)
@@ -383,13 +385,14 @@ class CustomView(discord.ui.View):
             self.user_mentions[button.custom_id] = []
 
 async def load_user_mentions():
+    global global_user_mentions
     try:
         async with aiofiles.open("user_mentions.json", "r") as f:
             data = await f.read()
             user_mentions = json.loads(data)
-            return {k: [await bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
+            global_user_mentions = {k: [await bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
     except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+        global_user_mentions = {}
 
 async def save_user_mentions(user_mentions):
     data = {k: [user.id for user in v] for k, v in user_mentions.items()}
@@ -428,6 +431,10 @@ class ButtonClick(discord.ui.Button):
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
         await interaction.response.edit_message(embed=embed)
 
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+    await load_user_mentions()    
         
 @bot.command(name='말하기')
 async def speak(ctx):
