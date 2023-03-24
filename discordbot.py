@@ -371,7 +371,27 @@ async def close_poll(ctx, poll_id: str):
 intents.typing = False
 intents.presences = False
 
-global_user_mentions = None
+class UserMentions:
+    def __init__(self, bot):
+        self.bot = bot
+        self.user_mentions = None
+        self.bot.loop.create_task(self.load_user_mentions())
+
+    async def load_user_mentions(self):
+        try:
+            async with aiofiles.open("user_mentions.json", "r") as f:
+                data = await f.read()
+                user_mentions = json.loads(data)
+                self.user_mentions = {k: [await self.bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.user_mentions = {}
+
+    async def save_user_mentions(self):
+        data = {k: [user.id for user in v] for k, v in self.user_mentions.items()}
+        async with aiofiles.open("user_mentions.json", "w") as f:
+            await f.write(json.dumps(data))
+
+user_mentions_instance = UserMentions(bot)
 
 class CustomView(discord.ui.View):
     def __init__(self, user_mentions=None):
@@ -382,23 +402,6 @@ class CustomView(discord.ui.View):
         self.add_item(button)
         if button.custom_id not in self.user_mentions:
             self.user_mentions[button.custom_id] = []
-
-async def load_user_mentions():
-    global global_user_mentions
-    if global_user_mentions is not None:  # Add this line to prevent reloading if data is already loaded
-        return
-    try:
-        async with aiofiles.open("user_mentions.json", "r") as f:
-            data = await f.read()
-            user_mentions = json.loads(data)
-            global_user_mentions = {k: [await bot.fetch_user(int(user_id)) for user_id in v] for k, v in user_mentions.items()}
-    except (FileNotFoundError, json.JSONDecodeError):
-        global_user_mentions = {}
-
-async def save_user_mentions(user_mentions):
-    data = {k: [user.id for user in v] for k, v in user_mentions.items()}
-    async with aiofiles.open("user_mentions.json", "w") as f:
-        await f.write(json.dumps(data))
 
 class ButtonClick(discord.ui.Button):
     def __init__(self, label, view):
@@ -424,7 +427,7 @@ class ButtonClick(discord.ui.Button):
             user_mentions.append(user)
             await interaction.user.add_roles(role)
 
-        await save_user_mentions(view.user_mentions)
+        await user_mentions_instance.save_user_mentions()
 
         embed = discord.Embed(title="말하기 스터디 참여 현황")
         for button in view.children:
@@ -432,19 +435,13 @@ class ButtonClick(discord.ui.Button):
             embed.add_field(name=button.label, value=mentions_str if mentions_str else "아직 참여자가 없어요 :(", inline=True)
         await interaction.response.edit_message(embed=embed)
 
-@bot.event
-async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
-    await load_user_mentions()    
         
 @bot.command(name='말하기')
 async def speak(ctx):
     await display_speak(ctx)
     
 async def display_speak(ctx):
-    global global_user_mentions
-    # Remove the await load_user_mentions() line
-    user_mentions = global_user_mentions
+    user_mentions = user_mentions_instance.user_mentions
     view = CustomView(user_mentions)
     buttons = [
         ButtonClick("스페인어", view),
