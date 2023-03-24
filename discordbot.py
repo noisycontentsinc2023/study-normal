@@ -172,16 +172,15 @@ async def search_image(ctx, *args):
         data = response.json()
 
         if len(data['items']) > 0:
-            # Extract the top search result
+            # Extract the top 2 search results
             results = data['items'][:2]
 
-            # Format the search result as an embedded message
-            embed = discord.Embed(title=f"Search Results for \"{query}\"", color=0x0099ff)
+            # Create a separate embedded message for each search result
             for result in results:
+                embed = discord.Embed(title=result['title'], color=0x0099ff)
                 embed.set_image(url=result['thumbnail'])
-                embed.add_field(name=result['title'], value=result['link'], inline=False)
-                
-            await ctx.send(embed=embed)
+                embed.add_field(name="URL", value=result['link'], inline=False)
+                await ctx.send(embed=embed)
         else:
             await ctx.send(f"No search results for \"{query}\".")
     else:
