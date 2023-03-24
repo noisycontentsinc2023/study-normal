@@ -178,7 +178,7 @@ async def search_image(ctx, *args):
             results = data['items'][:2]
 
             # Create a separate embedded message for each search result
-            ffor result in results:
+            for result in results:
                 embed = discord.Embed(color=0x0099ff)
                 embed.set_image(url=result['thumbnail'])
                 await ctx.send(embed=embed)
