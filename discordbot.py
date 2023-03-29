@@ -21,7 +21,7 @@ from discord.ext import commands
 from discord.utils import get
 from dataclasses import dataclass
 from typing import List, Dict, Optional
-from discord.ext.commands import when_mentioned_or, CommandNotFound, has_permissions, NoPrivateMessage, Bot, \
+from discord.ext.commands import check, when_mentioned_or, CommandNotFound, has_permissions, NoPrivateMessage, Bot, \
     ExpectedClosingQuoteError
 from collections import defaultdict
 
