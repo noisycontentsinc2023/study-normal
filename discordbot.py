@@ -387,12 +387,14 @@ def has_specific_roles(allowed_role_ids):
 allowed_role_ids = [922400231549722664, 1019164281696174180]    
 
 @bot.command(name='고정')
+@has_specific_roles(allowed_role_ids)
 async def sticky(ctx, *, message):
     global sticky_messages
     sticky_messages[ctx.channel.id] = message
     await ctx.send(f'메시지가 고정됐습니다!')
 
 @bot.command(name='해제')
+@has_specific_roles(allowed_role_ids)
 async def unsticky(ctx):
     global sticky_messages
     if ctx.channel.id in sticky_messages:
