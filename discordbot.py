@@ -377,9 +377,14 @@ intents.messages = True
 sticky_messages = {}
 last_sticky_messages = {}
 
-@bot.event
-async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
+def has_specific_roles(allowed_role_ids):
+    async def predicate(ctx):
+        allowed_roles = [ctx.guild.get_role(role_id) for role_id in allowed_role_ids]
+        return any(role in ctx.author.roles for role in allowed_roles)
+
+    return check(predicate)
+
+allowed_role_ids = [922400231549722664, 1019164281696174180]    
 
 @bot.command(name='고정')
 async def sticky(ctx, *, message):
