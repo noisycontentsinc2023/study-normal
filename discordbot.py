@@ -503,6 +503,16 @@ async def uncheck(ctx, option_num: int):
     else:
         await ctx.send("TODO list 에 없는 항목이에요")
 
+#------------------------------------------------운세------------------------------------------------------# 
+        
+@bot.command(name='운세')
+async def Fortune(ctx):
+    embed = discord.Embed(title="2023년 외국어 운세보기", description="올해 나의 운세를 외국어로 점쳐봅시다!", color=0xffd700)
+    embed.set_footer(text="클릭하여 운세를 확인하세요!")
+    button = discord.ui.Button(style=discord.ButtonStyle.primary, label="올해 나의 운세는?", url="https://bit.ly/2023_fortune")
+    view = discord.ui.View()
+    view.add_item(button)
+    await ctx.send(embed=embed, view=view)
 #Run the bot
 bot.run(TOKEN)
 
