@@ -635,7 +635,7 @@ async def delete_memo(ctx, memo_number: int):
     # Clear the last cell after shifting the memos or if the deleted memo is the last one
     sheet.update_cell(index_to_delete + len(remaining_memos) - 1, col, '')
 
-    await ctx.send(f'{ctx.author.mention} {memo_number} 번 ')
+    await ctx.send(f'{ctx.author.mention} {memo_number}번 메모가 정상적으로 삭제됐어요!')
     
 #Run the bot
 bot.run(TOKEN)
