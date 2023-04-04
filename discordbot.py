@@ -525,7 +525,7 @@ async def study(ctx):
     embed = discord.Embed(title="공부..할까..말까?", description=message, color=0xffd700)
     await ctx.send(embed=embed)
     
-#-------------------------메모모-------------------------#
+#-------------------------메모-------------------------#
 
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds_info = {
@@ -636,6 +636,24 @@ async def delete_memo(ctx, memo_number: int):
     sheet.update_cell(index_to_delete + len(remaining_memos) - 1, col, '')
 
     await ctx.send(f'{ctx.author.mention} {memo_number}번 메모가 정상적으로 삭제됐어요!')
+    
+@bot.command(name='전체삭제')
+async def delete_all_memos(ctx):
+    # Extract user ID
+    user_id = str(ctx.author.id)
+
+    # Find the column index of the user ID in row 1
+    header_values = sheet.row_values(1)
+    try:
+        col = header_values.index(user_id) + 1
+    except ValueError:
+        await ctx.send(f'{ctx.author.mention} 저장된 메모가 없습니다')
+        return
+
+    # Delete the entire column for the user
+    sheet.delete_columns(col)
+
+    await ctx.send(f'{ctx.author.mention} 모든 메모가 삭제됐어요!')
     
 #Run the bot
 bot.run(TOKEN)
