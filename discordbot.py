@@ -600,7 +600,7 @@ async def view_memo(ctx):
     if memo_values:
         memo_list = [f'{i+1}. {memo}' for i, memo in enumerate(memo_values)]
         memo_str = '\n'.join(memo_list)
-        embed = discord.Embed(title=f'{ctx.author.name}'의 메모입니다, description=memo_str)
+        embed = discord.Embed(title=f"{ctx.author.name}의 메모입니다", description=memo_str)
         await ctx.send(embed=embed)
     else:
         await ctx.send(f'{ctx.author.mention} 메모를 찾지 못했어요')
