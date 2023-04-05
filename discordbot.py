@@ -394,6 +394,15 @@ sticky_messages = {}
 for row in rows:
     sticky_messages[int(row[0])] = row[1]
     
+def has_specific_roles(allowed_role_ids):
+    async def predicate(ctx):
+        allowed_roles = [ctx.guild.get_role(role_id) for role_id in allowed_role_ids]
+        return any(role in ctx.author.roles for role in allowed_roles)
+
+    return check(predicate)
+
+allowed_role_ids = [922400231549722664, 1019164281696174180]    
+    
 # 스프레드시트에서 초기 고정 메시지를 가져옵니다.
 sticky_messages = {}
 
@@ -401,10 +410,32 @@ for row in sheet.get_all_values():
     if len(row) == 2 and row[0].isdigit():
         sticky_messages[int(row[0])] = row[1]
 
-last_sticky_messages = {}
+def refresh_sticky_messages():
+    global sticky_messages
+    global last_sticky_messages
+    sheet_values = sheet.get_all_values()
 
+    new_sticky_messages = {}  # 반복문 바깥에서 선언합니다.
+    for row in sheet_values:
+        if len(row) == 2 and row[0].isdigit():
+            channel_id = int(row[0])
+            message = row[1]
+            new_sticky_messages[channel_id] = message  # 값을 할당합니다.
+
+    deleted_channel_ids = set(sticky_messages.keys()) - set(new_sticky_messages.keys())
+    for channel_id in deleted_channel_ids:
+        if channel_id in last_sticky_messages:
+            old_message = last_sticky_messages[channel_id]
+            try:
+                asyncio.create_task(old_message.delete())  # asyncio.create_task를 사용하여 비동기로 실행합니다.
+            except discord.NotFound:
+                pass
+
+    sticky_messages = new_sticky_messages
+    last_sticky_messages = {}
 
 @bot.command(name='고정')
+@has_specific_roles(allowed_role_ids)
 async def sticky(ctx, *, message):
     global sticky_messages
     channel_id = ctx.channel.id
@@ -419,9 +450,13 @@ async def sticky(ctx, *, message):
         sheet.update_cell(row_num, 1, str(channel_id))
         sheet.update_cell(row_num, 2, message)
 
+    # 스프레드시트에 저장된 내용을 업데이트합니다.
+    refresh_sticky_messages()
+
     await ctx.send(f'메시지가 고정됐습니다!')
 
 @bot.command(name='해제')
+@has_specific_roles(allowed_role_ids)
 async def unsticky(ctx):
     global sticky_messages
     channel_id = ctx.channel.id
@@ -432,6 +467,9 @@ async def unsticky(ctx):
         # 스프레드시트에서 고정 메시지를 삭제합니다.
         row_num = int(sheet.col_values(1).index(str(channel_id))) + 1
         sheet.delete_row(row_num)
+
+        # 스프레드시트에 저장된 내용을 업데이트합니다.
+        refresh_sticky_messages()
 
         await ctx.send('고정이 해제됐어요!')
     else:
@@ -459,7 +497,6 @@ async def on_message(message):
 
         new_message = await message.channel.send(sticky_messages[message.channel.id])
         last_sticky_messages[message.channel.id] = new_message
-
 #------------------------------------------------TODO list------------------------------------------------------# 
 
 todos = {}
