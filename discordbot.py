@@ -393,11 +393,24 @@ creds_info = {
 }
 creds = service_account.Credentials.from_service_account_info(info=creds_info, scopes=scope)
 client = gspread.authorize(creds)
-sheet = client.open('테스트').worksheet('고정')
+sheet = client.open('테스트')
+new_worksheet_name = '고정'
+new_worksheet = client.create(new_worksheet_name)
+worksheet_id = new_worksheet.id
+print(f'Created new worksheet: {new_worksheet_name} ({worksheet_id})')
+
+# '고정' 시트 불러오기
+sheet_name = '고정'
+try:
+    sheet = client.open('테스트').worksheet(sheet_name)
+    print(f'Opened worksheet: {sheet_name}')
+except gspread.exceptions.WorksheetNotFound:
+    print(f'Could not find worksheet: {sheet_name}')
+
+sticky_messages_worksheet = client.open_by_key(worksheet_id).sheet1
 rows = sheet.get_all_values()
 
 sticky_messages = {}
-
 for row in rows:
     sticky_messages[int(row[0])] = row[1]
     
