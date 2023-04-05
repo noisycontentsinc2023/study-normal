@@ -387,7 +387,7 @@ async def close_poll(ctx, poll_id: str):
 
 #------------------------------------------------고정------------------------------------------------------# 
 
-sheet = client.open('테스트').worksheet('고정')
+sheet1 = client.open('테스트').worksheet('고정')
 rows = sheet.get_all_values()
 
 sticky_messages = {}
@@ -407,17 +407,17 @@ allowed_role_ids = [922400231549722664, 1019164281696174180]
 # 스프레드시트에서 초기 고정 메시지를 가져옵니다.
 sticky_messages = {}
 
-for row in sheet.get_all_values():
+for row in sheet1.get_all_values():
     if len(row) == 2 and row[0].isdigit():
         sticky_messages[int(row[0])] = row[1]
 
 def refresh_sticky_messages():
     global sticky_messages
     global last_sticky_messages
-    sheet_values = sheet.get_all_values()
+    sheet1_values = sheet1.get_all_values()
 
     new_sticky_messages = {}  # 반복문 바깥에서 선언합니다.
-    for row in sheet_values:
+    for row in sheet1_values:
         if len(row) == 2 and row[0].isdigit():
             channel_id = int(row[0])
             message = row[1]
@@ -443,13 +443,13 @@ async def sticky(ctx, *, message):
     sticky_messages[channel_id] = message
 
     # 스프레드시트에 고정 메시지를 저장합니다.
-    if str(channel_id) in sheet.col_values(1):
+    if str(channel_id) in sheet1.col_values(1):
         row_num = int(sheet.col_values(1).index(str(channel_id))) + 1
-        sheet.update_cell(row_num, 2, message)
+        sheet1.update_cell(row_num, 2, message)
     else:
         row_num = len(sheet.col_values(1)) + 1
-        sheet.update_cell(row_num, 1, str(channel_id))
-        sheet.update_cell(row_num, 2, message)
+        sheet1.update_cell(row_num, 1, str(channel_id))
+        sheet1.update_cell(row_num, 2, message)
 
     # 스프레드시트에 저장된 내용을 업데이트합니다.
     refresh_sticky_messages()
@@ -466,8 +466,8 @@ async def unsticky(ctx):
         del sticky_messages[channel_id]
 
         # 스프레드시트에서 고정 메시지를 삭제합니다.
-        row_num = int(sheet.col_values(1).index(str(channel_id))) + 1
-        sheet.delete_row(row_num)
+        row_num = int(sheet1.col_values(1).index(str(channel_id))) + 1
+        sheet1.delete_row(row_num)
 
         # 스프레드시트에 저장된 내용을 업데이트합니다.
         refresh_sticky_messages()
