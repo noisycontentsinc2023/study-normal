@@ -407,9 +407,12 @@ allowed_role_ids = [922400231549722664, 1019164281696174180]
 # 스프레드시트에서 초기 고정 메시지를 가져옵니다.
 sticky_messages = {}
 
-for row in sheet1.get_all_values():
+sheet1_values = sheet1.get_all_values()
+for row in sheet1_values:
     if len(row) == 2 and row[0].isdigit():
-        sticky_messages[int(row[0])] = row[1]
+        channel_id = int(row[0])
+        message = row[1]
+        sticky_messages[channel_id] = message
 
 def refresh_sticky_messages():
     global sticky_messages
