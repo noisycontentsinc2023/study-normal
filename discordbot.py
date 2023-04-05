@@ -417,28 +417,29 @@ for row in sheet.get_all_values():
     if len(row) == 2 and row[0].isdigit():
         sticky_messages[int(row[0])] = row[1]
 
-async def refresh_sticky_messages():
+def refresh_sticky_messages():
     global sticky_messages
     global last_sticky_messages
     sheet_values = sheet.get_all_values()
 
-    new_sticky_messages = {}
+    new_sticky_messages = {}  # 반복문 바깥에서 선언합니다.
     for row in sheet_values:
         if len(row) == 2 and row[0].isdigit():
-            new_sticky_messages[int(row[0])] = row[1]
+            channel_id = int(row[0])
+            message = row[1]
+            new_sticky_messages[channel_id] = message  # 값을 할당합니다.
 
     deleted_channel_ids = set(sticky_messages.keys()) - set(new_sticky_messages.keys())
     for channel_id in deleted_channel_ids:
         if channel_id in last_sticky_messages:
             old_message = last_sticky_messages[channel_id]
-            async with channel.typing():
-                try:
-                    await old_message.delete()
-                except discord.NotFound:
-                    pass
+            try:
+                asyncio.create_task(old_message.delete())  # asyncio.create_task를 사용하여 비동기로 실행합니다.
+            except discord.NotFound:
+                pass
 
-sticky_messages = new_sticky_messages
-last_sticky_messages = {}
+    sticky_messages = new_sticky_messages
+    last_sticky_messages = {}
 
 @bot.command(name='고정')
 @has_specific_roles(allowed_role_ids)
