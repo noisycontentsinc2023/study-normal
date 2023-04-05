@@ -437,8 +437,8 @@ async def refresh_sticky_messages():
                 except discord.NotFound:
                     pass
 
-    sticky_messages = new_sticky_messages
-    last_sticky_messages = {}
+sticky_messages = new_sticky_messages
+last_sticky_messages = {}
 
 @bot.command(name='고정')
 @has_specific_roles(allowed_role_ids)
