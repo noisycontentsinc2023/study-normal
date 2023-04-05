@@ -659,7 +659,7 @@ async def delete_all_memos(ctx):
 
 class MenuSelector(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=none)
         self.category = None
         self.foods = {
             "분식": ["김밥", "라면", "떡볶이", "튀김", "순대", "만두", "라볶이", "어묵", "소떡소떡", "핫도그", "떡국", "잔치국수", "볶음밥"],
