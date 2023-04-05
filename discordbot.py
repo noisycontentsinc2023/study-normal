@@ -417,7 +417,7 @@ for row in sheet.get_all_values():
     if len(row) == 2 and row[0].isdigit():
         sticky_messages[int(row[0])] = row[1]
 
-async def refresh_sticky_messages():
+def refresh_sticky_messages():
     global sticky_messages
     global last_sticky_messages
     sheet_values = sheet.get_all_values()
@@ -438,7 +438,7 @@ async def refresh_sticky_messages():
 
     sticky_messages = new_sticky_messages
     last_sticky_messages = {}
-    
+
 @bot.command(name='고정')
 @has_specific_roles(allowed_role_ids)
 async def sticky(ctx, *, message):
