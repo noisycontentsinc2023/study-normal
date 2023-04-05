@@ -436,7 +436,11 @@ async def sticky(ctx, *, message):
         sheet.update_cell(row_num, 1, str(channel_id))
         sheet.update_cell(row_num, 2, message)
 
+    # 스프레드시트에 저장된 내용을 업데이트합니다.
+    refresh_sticky_messages()
+
     await ctx.send(f'메시지가 고정됐습니다!')
+
 
 @bot.command(name='해제')
 @has_specific_roles(allowed_role_ids)
