@@ -444,12 +444,12 @@ async def sticky(ctx, *, message):
 
     # 스프레드시트에 고정 메시지를 저장합니다.
     if str(channel_id) in sheet1.col_values(1):
-        row_num = int(sheet.col_values(1).index(str(channel_id))) + 1
-        sheet1.update_cell(row_num, 2, message)
+        row_num = int(sheet1.col_values(1).index(str(channel_id))) + 1
     else:
-        row_num = len(sheet.col_values(1)) + 1
-        sheet1.update_cell(row_num, 1, str(channel_id))
-        sheet1.update_cell(row_num, 2, message)
+        row_num = len(sheet1.col_values(1)) + 1
+
+    sheet1.update_cell(row_num, 1, str(channel_id))
+    sheet1.update_cell(row_num, 2, message)
 
     # 스프레드시트에 저장된 내용을 업데이트합니다.
     refresh_sticky_messages()
