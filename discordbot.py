@@ -406,6 +406,7 @@ allowed_role_ids = [922400231549722664, 1019164281696174180]
     
 # 스프레드시트에서 초기 고정 메시지를 가져옵니다.
 sticky_messages = {}
+last_sticky_messages = {}
 
 sheet1_values = sheet1.get_all_values()
 for row in sheet1_values:
