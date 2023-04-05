@@ -417,7 +417,7 @@ for row in sheet.get_all_values():
     if len(row) == 2 and row[0].isdigit():
         sticky_messages[int(row[0])] = row[1]
 
-def refresh_sticky_messages():
+async def refresh_sticky_messages():
     global sticky_messages
     global last_sticky_messages
     sheet_values = sheet.get_all_values()
@@ -431,10 +431,11 @@ def refresh_sticky_messages():
     for channel_id in deleted_channel_ids:
         if channel_id in last_sticky_messages:
             old_message = last_sticky_messages[channel_id]
-            try:
-                await old_message.delete()
-            except discord.NotFound:
-                pass
+            async with channel.typing():
+                try:
+                    await old_message.delete()
+                except discord.NotFound:
+                    pass
 
     sticky_messages = new_sticky_messages
     last_sticky_messages = {}
