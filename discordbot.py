@@ -654,6 +654,80 @@ async def delete_all_memos(ctx):
     sheet.delete_columns(col)
 
     await ctx.send(f'{ctx.author.mention} 모든 메모가 삭제됐어요!')
+   
+#-------------------------메뉴추천-------------------------#
+
+class MenuSelector(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.category = None
+        self.foods = {
+            "분식": ["김밥", "라면", "떡볶이", "튀김", "순대", "만두", "라볶이", "어묵", "소떡소떡", "핫도그", "떡국", "잔치국수", "볶음밥"],
+            "한식": ["비빔밥", "불고기", "된장찌개", "김치찌개", "제육볶음", "족발", "부침개", "곱창", "보쌈", "치킨!!", "생선구이", "비빔밥", "쌈밥", "게장", "불고기"],
+            "중식": ["짜장면", "짬뽕", "탕수육", "양장피", "마라탕", "마라샹궈", "양꼬치", "깐쇼새우", "깐풍기"],
+            "일식": ["초밥", "우동", "돈까스", "라멘", "회", "타코야끼", "샤브샤브"],
+            "양식": ["피자", "파스타", "스테이크", "샐러드", "햄버거", "바베큐", "그라탕"],
+            "해장": ["우거지국", "홍합탕", "순대국", "콩나물국밥", "뼈해장국", "대파라면", "선지해장국", "매생이국", "북엇국"],
+            "디저트": ["아이스크림", "빵", "과일", "케이크", "마카롱", "요거트", "와플"],
+            "편의점": ["삼각김밥", "도시락", "샌드위치", "컵라면", "컵밥", "라이스바"],
+            "기타": ["월남쌈", "나시고랭", "브리또", "케밥", "맥앤치즈", "분짜", "쌀국수"],
+        }
+        self.menu_select = discord.ui.Select(
+            placeholder="원하시는 종류를 선택해주세요!",
+            options=[
+                discord.SelectOption(label="분식", value="분식"),
+                discord.SelectOption(label="한식", value="한식"),
+                discord.SelectOption(label="중식", value="중식"),
+                discord.SelectOption(label="일식", value="일식"),
+                discord.SelectOption(label="양식", value="양식"),
+                discord.SelectOption(label="해장", value="해장"),
+                discord.SelectOption(label="디저트", value="디저트"),
+                discord.SelectOption(label="편의점", value="편의점"),
+                discord.SelectOption(label="기타", value="기타"),
+            ],
+        )
+        self.menu_select.callback = self.select_callback
+        self.add_item(self.menu_select)
+
+        self.recommend_button = discord.ui.Button(
+            style=discord.ButtonStyle.primary,
+            label="추천받기!",
+            disabled=True
+        )
+        self.recommend_button.callback = self.recommend_callback
+        self.add_item(self.recommend_button)
+
+        self.map_button = discord.ui.Button(
+            style=discord.ButtonStyle.link,
+            label="재학생들의 국내/외 맛집 리스트",
+            url="https://www.google.com/maps/d/edit?mid=1-le8EVMGB6tH-4ryziNUUub1XyOSgHI&usp=sharing"
+        )
+        self.add_item(self.map_button)
+
+    async def select_callback(self, interaction: discord.Interaction):
+        self.category = interaction.data['values'][0]
+
+        # update the label and disabled state of the existing button
+        self.recommend_button.callback = self.recommend_callback
+        self.recommend_button.disabled = False
+
+        await interaction.response.edit_message(view=self)
+
+    async def recommend_callback(self, interaction: discord.Interaction):
+        if self.category is not None:
+            selected_food = random.choice(self.foods[self.category])
+        else:
+            selected_food = "카테고리를 선택해주세요."
+        food = discord.Embed(title=f"{self.category} 추천메뉴", description="아래 추천받기 버튼을 클릭해서 메뉴를 추천받아보세요!", color=0x00ff00)
+        food.add_field(name="메뉴", value=f"{selected_food}")
+        food.set_footer(text="맛있게 드세요! 🥳")
+        await interaction.response.edit_message(embed=food, view=self)
+                        
+@bot.command(name='메뉴추천')
+async def menu_recommendation(ctx):
+    selector_view = MenuSelector()
+    message = await ctx.send("원하시는 종류를 선택해주세요!", view=selector_view)
+    selector_view.message = message
     
 #Run the bot
 bot.run(TOKEN)
