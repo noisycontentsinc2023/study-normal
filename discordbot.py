@@ -388,7 +388,7 @@ async def close_poll(ctx, poll_id: str):
 #------------------------------------------------고정------------------------------------------------------# 
 
 sheet1 = client.open('테스트').worksheet('고정')
-rows = sheet.get_all_values()
+rows = sheet1.get_all_values()
 
 sticky_messages = {}
 
