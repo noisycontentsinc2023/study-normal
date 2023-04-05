@@ -728,6 +728,48 @@ async def menu_recommendation(ctx):
     selector_view = MenuSelector()
     message = await ctx.send("원하시는 종류를 선택해주세요!", view=selector_view)
     selector_view.message = message
+   
+#------------------------------------------------#
+
+@bot.command(name='가위')
+async def rock_paper_scissors(ctx):
+    user_choice = '가위'
+    await play_game(user_choice, ctx)
+
+@bot.command(name='바위')
+async def rock_paper_scissors(ctx):
+    user_choice = '바위'
+    await play_game(user_choice, ctx)
+
+@bot.command(name='보')
+async def rock_paper_scissors(ctx):
+    user_choice = '보'
+    await play_game(user_choice, ctx)
+
+async def play_game(user_choice, ctx):
+    rps = ['가위', '바위', '보']
+    bot_choice = random.choice(rps)
+
+    result = None
+    if user_choice == bot_choice:
+        result = '비겼습니다!'
+        color = discord.Color.dark_gray()
+        emoji = '🤝'
+    elif (user_choice == '가위' and bot_choice == '보') or \
+         (user_choice == '바위' and bot_choice == '가위') or \
+         (user_choice == '보' and bot_choice == '바위'):
+        result = '테이망령이 졌습니다!😭'
+        color = discord.Color.green()
+        emoji = '🎉'
+    else:
+        result = '테이망령이 이겼습니다!🥳'
+        color = discord.Color.red()
+        emoji = '😭'
+
+    embed = discord.Embed(title=f'{user_choice} 대 {bot_choice}', description=result, color=color)
+    embed.set_author(name='게임 결과')
+
+    await ctx.send(embed=embed)
     
 #Run the bot
 bot.run(TOKEN)
