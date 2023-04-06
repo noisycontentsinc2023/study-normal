@@ -629,35 +629,35 @@ async def on_ready():
 
 @bot.command(name='메모')
 async def memo(ctx):
-    # Extract user display name instead of ID
-    user_display_name = ctx.author.display_name
+    # Extract username instead of ID
+    username = ctx.author.name
     
     # Extract memo content from message
     message_content = ctx.message.content
     memo = message_content.split('!메모 ')[1]
 
-    # Find the next available column to write data to using the display name
+    # Find the next available column to write data to using the username
     header_values = sheet.row_values(1)
     if not header_values:
         col = 1
-        sheet.update_cell(1, col, user_display_name)
-    elif user_display_name not in header_values:
+        sheet.update_cell(1, col, username)
+    elif username not in header_values:
         last_user_col = sheet.col_count
         last_user_name = header_values[-1]
         last_user_name_col = header_values.index(last_user_name) + 1
         col = last_user_name_col + 1
         sheet.add_cols(1)
-        sheet.update_cell(1, col, user_display_name)
+        sheet.update_cell(1, col, username)
     else:
-        col = header_values.index(user_display_name) + 1
+        col = header_values.index(username) + 1
 
     # Find the next available row to write data to
     values = sheet.col_values(col)
     row = len(values) + 1
 
-    # Write user display name and memo content to the corresponding cell
+    # Write username and memo content to the corresponding cell
     if row == 1:
-        sheet.update_cell(row, col, user_display_name)
+        sheet.update_cell(row, col, username)
         row += 1
     sheet.update_cell(row, col, memo)
 
@@ -665,13 +665,13 @@ async def memo(ctx):
 
 @bot.command(name='메모보기')
 async def view_memo(ctx):
-    # Extract user display name instead of ID
-    user_display_name = ctx.author.display_name
+    # Extract username instead of ID
+    username = ctx.author.name
 
-    # Find the column index of the user display name in row 1
+    # Find the column index of the username in row 1
     header_values = sheet.row_values(1)
     try:
-        col = header_values.index(user_display_name) + 1
+        col = header_values.index(username) + 1
     except ValueError:
         await ctx.send(f'{ctx.author.mention} 메모를 찾을 수 없습니다 :(')
         return
@@ -689,12 +689,12 @@ async def view_memo(ctx):
 @bot.command(name='메모삭제')
 async def delete_memo(ctx, memo_number: int):
     # Extract user display name instead of ID
-    user_display_name = ctx.author.display_name
+    username = ctx.author.nam
 
     # Find the column index of the user display name in row 1
     header_values = sheet.row_values(1)
     try:
-        col = header_values.index(user_display_name) + 1
+        col = header_values.index(username) + 1
     except ValueError:
         await ctx.send(f'{ctx.author.mention} 메모를 찾지 못했어요')
         return
@@ -721,12 +721,12 @@ async def delete_memo(ctx, memo_number: int):
 @bot.command(name='전체삭제')
 async def delete_all_memos(ctx):
     # Extract user display name instead of ID
-    user_display_name = ctx.author.display_name
+    username = ctx.author.nam
 
     # Find the column index of the user display name in row 1
     header_values = sheet.row_values(1)
     try:
-        col = header_values.index(user_display_name) + 1
+        col = header_values.index(username) + 1
     except ValueError:
         await ctx.send(f'{ctx.author.mention} 저장된 메모가 없습니다')
         return
