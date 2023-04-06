@@ -609,10 +609,6 @@ sheet = client.open('테스트').worksheet('메모')
 async def on_ready():
     print(f'Logged in as {bot.user.name} ({bot.user.id})')
 
-Sure, to replace all instances of the user ID with the user's display name in the code, you can modify the memo, view_memo, delete_memo, and delete_all_memos functions as follows:
-
-python
-Copy code
 @bot.command(name='메모')
 async def memo(ctx):
     # Extract user display name instead of ID
