@@ -59,7 +59,7 @@ creds_info = {
 creds = service_account.Credentials.from_service_account_info(info=creds_info, scopes=scope)
 client = gspread.authorize(creds)
 
-@bot.command(name='사용', aliases=['사용법', '도움말])
+@bot.command(name='사용', aliases=['사용법', '도움말'])
 async def usage(ctx):
     embed = discord.Embed(title='망령이 사용', color=0x00ff00)
     embed.add_field(name='!검색 [검색어]', value='네이버 검색기록을 가지고 옵니다', inline=False)
