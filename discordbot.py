@@ -896,6 +896,11 @@ class AuthButton(discord.ui.Button):
 
 @bot.command(name='인증')
 async def Authentication(ctx, date):
+    # Check if there is an attachment in the message
+    if ctx.message.attachments:
+        attachment = ctx.message.attachments[0]
+        await ctx.send(file=discord.File(io.BytesIO(await attachment.read()), filename=attachment.filename))
+
     await ctx.message.delete()
     
     # Validate the input date
