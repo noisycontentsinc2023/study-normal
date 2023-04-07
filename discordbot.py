@@ -405,7 +405,7 @@ async def close_poll(ctx, poll_id: str):
 
 #------------------------------------------------고정------------------------------------------------------# 
 
-sheet1 = client.open('테스트').worksheet('고정')
+sheet1 = client.open('서버기록').worksheet('고정')
 rows = sheet1.get_all_values()
 
 sticky_messages = {}
@@ -621,7 +621,7 @@ async def study(ctx):
     
 #-------------------------메모-------------------------#
 
-sheet = client.open('테스트').worksheet('메모')
+sheet = client.open('서버기록').worksheet('메모')
 
 @bot.event
 async def on_ready():
@@ -854,6 +854,75 @@ async def play_game(user_choice, ctx, user_emoji):
     embed.set_author(name='게임 결과')
 
     await ctx.send(embed=embed)
+    
+#------------------------------------------------#
+# Set up Google Sheets worksheet
+sheet2 = client.open('서버기록').worksheet('일취월장')
+rows = sheet2.get_all_values()
+class AuthButton(discord.ui.Button):
+    def __init__(self, ctx, user, date):
+        super().__init__(style=discord.ButtonStyle.green, label="확인 ")
+        self.ctx = ctx
+        self.user = user
+        self.date = date
+    
+    async def callback(self, interaction: discord.Interaction):
+        if discord.utils.get(interaction.user.roles, id=922400231549722664) is None:
+            return
+        existing_users = sheet2.col_values(1)
+        if str(self.user) not in existing_users:
+            empty_row = len(existing_users) + 1
+            sheet2.update_cell(empty_row, 1, str(self.user))
+            existing_dates = sheet2.row_values(1)
+            if self.date not in existing_dates:
+                empty_col = len(existing_dates) + 1
+                sheet2.update_cell(1, empty_col, self.date)
+                sheet2.update_cell(empty_row, empty_col, "1")
+            else:
+                col = existing_dates.index(self.date) + 1
+                sheet2.update_cell(empty_row, col, "1")
+        else:
+            index = existing_users.index(str(self.user)) + 1
+            existing_dates = sheet2.row_values(1)
+            if self.date not in existing_dates:
+                empty_col = len(existing_dates) + 1
+                sheet2.update_cell(1, empty_col, self.date)
+                sheet2.update_cell(index, empty_col, "1")
+            else:
+                col = existing_dates.index(self.date) + 1
+                sheet2.update_cell(index, col, "1")
+        await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료됐습니다"), view=None)
+
+@bot.command(name='인증')
+async def Authentication(ctx, date):
+    await ctx.message.delete()
+    
+    # Validate the input date
+    if not re.match(r'^(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$', date):
+        await ctx.send("정확한 날짜를 입력해주세요! 날짜는 네 자리 숫자로 작성해주세요. 1월 1일을 입력하시려면 0101을 입력해주세요.")
+        return
+      
+    existing_users = sheet2.col_values(1)
+    if str(ctx.author) in existing_users:
+        user_index = existing_users.index(str(ctx.author)) + 1
+        existing_dates = sheet2.row_values(1)
+        if date in existing_dates:
+            date_index = existing_dates.index(date) + 1
+            cell_value = sheet2.cell(user_index, date_index).value
+            if cell_value == "1":
+                await ctx.send(embed=discord.Embed(title="인증상황", description=f"{ctx.author.mention}님, 해당 날짜는 이미 인증되었습니다!"))
+                return
+
+    embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
+    view = discord.ui.View()
+    button = AuthButton(ctx, ctx.author, date)
+    view.add_item(button)
+    msg = await ctx.send(embed=embed, view=view)
+
+    def check(interaction: discord.Interaction):
+        return interaction.message.id == msg.id and interaction.data.get("component_type") == discord.ComponentType.button.value
+
+    await bot.wait_for("interaction", check=check)
     
 #Run the bot
 bot.run(TOKEN)
