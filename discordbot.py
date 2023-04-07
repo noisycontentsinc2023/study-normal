@@ -14,6 +14,7 @@ import string
 import aiofiles
 import json
 import gspread
+import re
 
 from google.oauth2 import service_account
 from bs4 import BeautifulSoup
