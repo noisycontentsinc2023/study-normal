@@ -922,7 +922,7 @@ async def Authentication(ctx, date):
     def check(interaction: discord.Interaction):
         return interaction.message.id == msg.id and interaction.data.get("component_type") == discord.ComponentType.button.value
 
-    await bot.wait_for("interaction", check=check)
+    await bot.wait_for("interaction", check=check, timeout=None)
     
 #Run the bot
 bot.run(TOKEN)
