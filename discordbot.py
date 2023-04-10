@@ -861,6 +861,15 @@ async def play_game(user_choice, ctx, user_emoji):
 sheet2 = client.open('서버기록').worksheet('일취월장')
 rows = sheet2.get_all_values()
 
+class CancelButton(discord.ui.Button):
+    def __init__(self, ctx):
+        super().__init__(style=discord.ButtonStyle.red, label="취소")
+        self.ctx = ctx
+    
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user == self.ctx.author:
+            await interaction.message.delete()
+            
 class AuthButton(discord.ui.Button):
     def __init__(self, ctx, user, date):
         super().__init__(style=discord.ButtonStyle.green, label="확인 ")
@@ -893,45 +902,14 @@ class AuthButton(discord.ui.Button):
             else:
                 col = existing_dates.index(self.date) + 1
                 sheet2.update_cell(index, col, "1")
-        await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료했습니다"), view=None)
+        await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료됐습니다"), view=None)
 
-async def refresh_message(ctx, date, msg):
+async def update_embed(ctx, date, msg):
     while True:
-        await asyncio.sleep(180)  # 3 minutes
-        new_msg = await send_or_update_message(ctx, date, msg)
-        if new_msg.id != msg.id:
-            await msg.delete()
-            msg = new_msg
-
-async def send_or_update_message(ctx, date, msg=None):
-    embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
-    view = discord.ui.View()
-    button = AuthButton(ctx, ctx.author, date)
-    view.add_item(button)
-    if msg:
-        await msg.edit(embed=embed, view=view)
-    else:
-        msg = await ctx.send(embed=embed, view=view)
-    return msg
-
-class CancelButton(discord.ui.Button):
-    def __init__(self, ctx):
-        super().__init__(style=discord.ButtonStyle.red, label="취소")
-        self.ctx = ctx
-    
-    async def callback(self, interaction: discord.Interaction):
-        if interaction.user == self.ctx.author:
-            await interaction.message.delete()
-            
-class UpdateButton(discord.ui.Button):
-    def __init__(self, ctx):
-        super().__init__(style=discord.ButtonStyle.blurple, label="갱신")
-        self.ctx = ctx
-
-    async def callback(self, interaction: discord.Interaction):
-        if interaction.user == self.ctx.author:
-            await Authentication(self.ctx, self.ctx.args[1])
-
+        embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
+        await msg.edit(embed=embed)
+        await asyncio.sleep(60)  # Wait for 60 seconds before updating again
+        
 @bot.command(name='인증')
 async def Authentication(ctx, date):
     
@@ -955,14 +933,15 @@ async def Authentication(ctx, date):
     view = discord.ui.View()
     button = AuthButton(ctx, ctx.author, date)
     view.add_item(button)
-    view.add_item(CancelButton(ctx))
-    view.add_item(UpdateButton(ctx))  # Add the UpdateButton to the view
+    view.add_item(CancelButton(ctx))  # Add the CancelButton to the view
     msg = await ctx.send(embed=embed, view=view)
+    
+    asyncio.create_task(update_embed(ctx, date, msg))  
 
     def check(interaction: discord.Interaction):
         return interaction.message.id == msg.id and interaction.data.get("component_type") == discord.ComponentType.button.value
 
-    await bot.wait_for("interaction", check=check, timeout=None)
+    await bot.wait_for("interaction", check=check)
     
 #Run the bot
 bot.run(TOKEN)
