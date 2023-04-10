@@ -904,6 +904,19 @@ class AuthButton(discord.ui.Button):
                 sheet2.update_cell(index, col, "1")
         await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료했습니다"), view=None)
 
+# New function to send or update the message with active buttons
+async def send_or_update_message(ctx, date, msg=None):
+    embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
+    view = discord.ui.View()
+    button = AuthButton(ctx, ctx.author, date)
+    view.add_item(button)
+    view.add_item(CancelButton(ctx))
+    if msg:
+        await msg.edit(embed=embed, view=view)
+    else:
+        msg = await ctx.send(embed=embed, view=view)
+    return msg
+
 @bot.command(name='인증')
 async def Authentication(ctx, date):
     await ctx.message.delete()
@@ -912,17 +925,17 @@ async def Authentication(ctx, date):
     if not re.match(r'^(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$', date):
         await ctx.send("정확한 날짜를 입력해주세요! 날짜는 네 자리 숫자로 작성해주세요. 1월 1일을 입력하시려면 0101을 입력해주세요.")
         return
-      
-    existing_users = sheet2.col_values(1)
-    if str(ctx.author) in existing_users:
-        user_index = existing_users.index(str(ctx.author)) + 1
-        existing_dates = sheet2.row_values(1)
-        if date in existing_dates:
-            date_index = existing_dates.index(date) + 1
-            cell_value = sheet2.cell(user_index, date_index).value
-            if cell_value == "1":
-                await ctx.send(embed=discord.Embed(title="인증상황", description=f"{ctx.author.mention}님, 해당 날짜는 이미 인증되었습니다!"))
-                return
+
+    msg = await send_or_update_message(ctx, date)
+
+    def check(interaction: discord.Interaction):
+        return interaction.message.id == msg.id and interaction.data.get("component_type") == discord.ComponentType.button.value
+
+    while True:
+        try:
+            await bot.wait_for("interaction", check=check, timeout=None)
+        except discord.InteractionFailed:
+            msg = await send_or_update_message(ctx, date, msg)
 
     embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
     view = discord.ui.View()
