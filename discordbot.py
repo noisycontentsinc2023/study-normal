@@ -900,9 +900,7 @@ class AuthButton(discord.ui.Button):
                 sheet2.update_cell(1, len(existing_dates) + 3, self.date)  # Add 2 to start saving from column C
 
             sheet2.update_cell(user_index, len(existing_dates) + 3, "1")
-            else:
-                col = existing_dates.index(self.date) + 1
-                sheet2.update_cell(index, col, "1")
+
         await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료됐습니다"), view=None)
         self.stop_loop = True  # Set stop_loop to True after editing the message
         
