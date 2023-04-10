@@ -868,6 +868,7 @@ class CancelButton(discord.ui.Button):
     
     async def callback(self, interaction: discord.Interaction):
         if interaction.user == self.ctx.author:
+            interaction.message.deleted = True  # Set the deleted flag
             await interaction.message.delete()
             
 class AuthButton(discord.ui.Button):
@@ -906,6 +907,8 @@ class AuthButton(discord.ui.Button):
 
 async def update_embed(ctx, date, msg):
     while True:
+        if msg.deleted:  # Check if the message is deleted
+            break
         embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
         await msg.edit(embed=embed)
         await asyncio.sleep(60)  # Wait for 60 seconds before updating again
