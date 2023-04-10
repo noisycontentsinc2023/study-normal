@@ -930,9 +930,16 @@ async def Authentication(ctx, date):
     def check(interaction: discord.Interaction):
         return interaction.message.id == msg.id and interaction.data.get("component_type") == discord.ComponentType.button.value
 
+    start_time = time.time()
     while True:
         try:
-            await bot.wait_for("interaction", check=check)
+            elapsed_time = time.time() - start_time
+            if elapsed_time > 600:  # 10 minutes in seconds
+                msg = await send_or_update_message(ctx, date, msg)
+                start_time = time.time()  # Reset the start time
+            await bot.wait_for("interaction", check=check, timeout=1)  # Set a short timeout
+        except discord.TimeoutError:
+            continue
         except discord.InteractionFailed:
             msg = await send_or_update_message(ctx, date, msg)
 
