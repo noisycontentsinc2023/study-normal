@@ -881,25 +881,19 @@ class AuthButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction):
         if discord.utils.get(interaction.user.roles, id=922400231549722664) is None:
             return
+        # Find the user_index
         existing_users = sheet2.col_values(1)
-        if str(self.user) not in existing_users:
-            empty_row = len(existing_users) + 1
-            sheet2.update_cell(empty_row, 1, str(self.user))
-            existing_dates = sheet2.row_values(1)
-            if self.date not in existing_dates:
-                empty_col = len(existing_dates) + 1
-                sheet2.update_cell(1, empty_col, self.date)
-                sheet2.update_cell(empty_row, empty_col, "1")
-            else:
-                col = existing_dates.index(self.date) + 1
-                sheet2.update_cell(empty_row, col, "1")
+        if str(self.author) in existing_users:
+            user_index = existing_users.index(str(self.author)) + 1
         else:
-            index = existing_users.index(str(self.user)) + 1
-            existing_dates = sheet2.row_values(1)
-            if self.date not in existing_dates:
-                sheet2.update_cell(1, len(existing_dates) + 3, self.date)  # Add 2 to start saving from column C
+            user_index = len(existing_users) + 1
+            sheet2.update_cell(user_index, 1, str(self.author))
 
-            sheet2.update_cell(user_index, len(existing_dates) + 3, "1")
+        existing_dates = sheet2.row_values(1)
+        if self.date not in existing_dates:
+            sheet2.update_cell(1, len(existing_dates) + 3, self.date)  # Add 2 to start saving from column C
+
+        sheet2.update_cell(user_index, len(existing_dates) + 3, "1")  # Add 2 to start saving from column C
 
         await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료됐습니다"), view=None)
         self.stop_loop = True  # Set stop_loop to True after editing the message
