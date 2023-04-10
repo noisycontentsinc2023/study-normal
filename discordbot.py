@@ -907,16 +907,17 @@ class AuthButton(discord.ui.Button):
 
 async def update_embed(ctx, date, msg):
     while True:
-        if msg.deleted:  # Check if the message is deleted
-            break
+        try:
+            view = discord.ui.View()
+            button = AuthButton(ctx, ctx.author, date)
+            view.add_item(button)
+            view.add_item(CancelButton(ctx))  # Add the CancelButton to the view
 
-        view = discord.ui.View()
-        button = AuthButton(ctx, ctx.author, date)
-        view.add_item(button)
-        view.add_item(CancelButton(ctx))  # Add the CancelButton to the view
-
-        await msg.edit(embed=embed, view=view)
-        await asyncio.sleep(60)  # Wait for 60 seconds before updating again
+            embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
+            await msg.edit(embed=embed, view=view)
+            await asyncio.sleep(60)  # Wait for 60 seconds before updating again
+        except NotFound:
+            break  # Exit the loop if the message is deleted
         
 @bot.command(name='인증')
 async def Authentication(ctx, date):
