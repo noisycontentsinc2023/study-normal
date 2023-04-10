@@ -872,7 +872,7 @@ class CancelButton(discord.ui.Button):
             
 class AuthButton(discord.ui.Button):
     def __init__(self, ctx, user, date):
-        super().__init__(style=discord.ButtonStyle.green, label="확인 ")
+        super().__init__(style=discord.ButtonStyle.green, label="확인")
         self.ctx = ctx
         self.user = user
         self.date = date
@@ -897,9 +897,9 @@ class AuthButton(discord.ui.Button):
             index = existing_users.index(str(self.user)) + 1
             existing_dates = sheet2.row_values(1)
             if self.date not in existing_dates:
-                empty_col = len(existing_dates) + 1
-                sheet2.update_cell(1, empty_col, self.date)
-                sheet2.update_cell(index, empty_col, "1")
+                sheet2.update_cell(1, len(existing_dates) + 3, self.date)  # Add 2 to start saving from column C
+
+            sheet2.update_cell(user_index, len(existing_dates) + 3, "1")
             else:
                 col = existing_dates.index(self.date) + 1
                 sheet2.update_cell(index, col, "1")
@@ -942,7 +942,7 @@ async def Authentication(ctx, date):
         user_index = existing_users.index(str(ctx.author)) + 1
         existing_dates = sheet2.row_values(1)
         if date in existing_dates:
-            date_index = existing_dates.index(date) + 1
+            date_index = existing_dates.index(date) + 3
             cell_value = sheet2.cell(user_index, date_index).value
             if cell_value == "1":
                 await ctx.send(embed=discord.Embed(title="인증상황", description=f"{ctx.author.mention}님, 해당 날짜는 이미 인증되었습니다!"))
