@@ -896,7 +896,6 @@ class AuthButton(discord.ui.Button):
 
 @bot.command(name='인증')
 async def Authentication(ctx, date):
-    await ctx.message.delete()
     
     # Validate the input date
     if not re.match(r'^(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$', date):
