@@ -894,6 +894,25 @@ class AuthButton(discord.ui.Button):
                 sheet2.update_cell(index, col, "1")
         await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료했습니다"), view=None)
 
+async def refresh_message(ctx, date, msg):
+    while True:
+        await asyncio.sleep(180)  # 3 minutes
+        new_msg = await send_or_update_message(ctx, date, msg)
+        if new_msg.id != msg.id:
+            await msg.delete()
+            msg = new_msg
+
+async def send_or_update_message(ctx, date, msg=None):
+    embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
+    view = discord.ui.View()
+    button = AuthButton(ctx, ctx.author, date)
+    view.add_item(button)
+    if msg:
+        await msg.edit(embed=embed, view=view)
+    else:
+        msg = await ctx.send(embed=embed, view=view)
+    return msg
+
 @bot.command(name='인증')
 async def Authentication(ctx, date):
     
