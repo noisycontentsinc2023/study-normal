@@ -868,11 +868,12 @@ class CancelButton(discord.ui.Button):
     
     async def callback(self, interaction: discord.Interaction):
         if interaction.user == self.ctx.author:
+            interaction.message.deleted = True  # Set the deleted flag
             await interaction.message.delete()
             
 class AuthButton(discord.ui.Button):
     def __init__(self, ctx, user, date):
-        super().__init__(style=discord.ButtonStyle.green, label="확인")
+        super().__init__(style=discord.ButtonStyle.green, label="확인 ")
         self.ctx = ctx
         self.user = user
         self.date = date
@@ -881,20 +882,28 @@ class AuthButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction):
         if discord.utils.get(interaction.user.roles, id=922400231549722664) is None:
             return
-        # Find the user_index
         existing_users = sheet2.col_values(1)
-        if str(self.author) in existing_users:
-            user_index = existing_users.index(str(self.author)) + 1
+        if str(self.user) not in existing_users:
+            empty_row = len(existing_users) + 1
+            sheet2.update_cell(empty_row, 1, str(self.user))
+            existing_dates = sheet2.row_values(1)
+            if self.date not in existing_dates:
+                empty_col = len(existing_dates) + 1
+                sheet2.update_cell(1, empty_col, self.date)
+                sheet2.update_cell(empty_row, empty_col, "1")
+            else:
+                col = existing_dates.index(self.date) + 1
+                sheet2.update_cell(empty_row, col, "1")
         else:
-            user_index = len(existing_users) + 1
-            sheet2.update_cell(user_index, 1, str(self.author))
-
-        existing_dates = sheet2.row_values(1)
-        if self.date not in existing_dates:
-            sheet2.update_cell(1, len(existing_dates) + 3, self.date)  # Add 2 to start saving from column C
-
-        sheet2.update_cell(user_index, len(existing_dates) + 3, "1")  # Add 2 to start saving from column C
-
+            index = existing_users.index(str(self.user)) + 1
+            existing_dates = sheet2.row_values(1)
+            if self.date not in existing_dates:
+                empty_col = len(existing_dates) + 1
+                sheet2.update_cell(1, empty_col, self.date)
+                sheet2.update_cell(index, empty_col, "1")
+            else:
+                col = existing_dates.index(self.date) + 1
+                sheet2.update_cell(index, col, "1")
         await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료됐습니다"), view=None)
         self.stop_loop = True  # Set stop_loop to True after editing the message
         
@@ -903,12 +912,6 @@ async def update_embed(ctx, date, msg):
     while True:
         try:
             if button.stop_loop:  # Check if stop_loop is True before updating the message
-                break
-
-            # Check if the message is deleted using fetch_message
-            try:
-                await msg.channel.fetch_message(msg.id)
-            except NotFound:
                 break
 
             view = discord.ui.View(timeout=None)
@@ -934,7 +937,7 @@ async def Authentication(ctx, date):
         user_index = existing_users.index(str(ctx.author)) + 1
         existing_dates = sheet2.row_values(1)
         if date in existing_dates:
-            date_index = existing_dates.index(date) + 3
+            date_index = existing_dates.index(date) + 1
             cell_value = sheet2.cell(user_index, date_index).value
             if cell_value == "1":
                 await ctx.send(embed=discord.Embed(title="인증상황", description=f"{ctx.author.mention}님, 해당 날짜는 이미 인증되었습니다!"))
