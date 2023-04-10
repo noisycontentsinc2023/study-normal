@@ -908,7 +908,7 @@ class AuthButton(discord.ui.Button):
 async def update_embed(ctx, date, msg):
     while True:
         try:
-            view = discord.ui.View()
+            view = discord.ui.View(timeout=None)  # Set timeout to None to keep the buttons active indefinitely
             button = AuthButton(ctx, ctx.author, date)
             view.add_item(button)
             view.add_item(CancelButton(ctx))  # Add the CancelButton to the view
