@@ -932,7 +932,7 @@ async def Authentication(ctx, date):
 
     while True:
         try:
-            await bot.wait_for("interaction", check=check, timeout=None)
+            await bot.wait_for("interaction", check=check)
         except discord.InteractionFailed:
             msg = await send_or_update_message(ctx, date, msg)
 
