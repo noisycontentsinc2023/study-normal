@@ -877,6 +877,7 @@ class AuthButton(discord.ui.Button):
         self.ctx = ctx
         self.user = user
         self.date = date
+        self.stop_loop = False  # Add the stop_loop attribute
     
     async def callback(self, interaction: discord.Interaction):
         if discord.utils.get(interaction.user.roles, id=922400231549722664) is None:
@@ -904,20 +905,24 @@ class AuthButton(discord.ui.Button):
                 col = existing_dates.index(self.date) + 1
                 sheet2.update_cell(index, col, "1")
         await interaction.message.edit(embed=discord.Embed(title="인증상황", description=f"{interaction.user.mention}님이 {self.ctx.author.mention}의 {self.date} 일취월장 인증을 완료됐습니다"), view=None)
-
+        self.stop_loop = True  # Set stop_loop to True after editing the message
+        
 async def update_embed(ctx, date, msg):
+    button = AuthButton(ctx, ctx.author, date)  # Move button creation outside of the loop
     while True:
         try:
-            view = discord.ui.View(timeout=None)  # Set timeout to None to keep the buttons active indefinitely
-            button = AuthButton(ctx, ctx.author, date)
+            if button.stop_loop:  # Check if stop_loop is True before updating the message
+                break
+
+            view = discord.ui.View(timeout=None)
             view.add_item(button)
-            view.add_item(CancelButton(ctx))  # Add the CancelButton to the view
+            view.add_item(CancelButton(ctx))
 
             embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
             await msg.edit(embed=embed, view=view)
-            await asyncio.sleep(60)  # Wait for 60 seconds before updating again
+            await asyncio.sleep(60)
         except NotFound:
-            break  # Exit the loop if the message is deleted
+            break
         
 @bot.command(name='인증')
 async def Authentication(ctx, date):
