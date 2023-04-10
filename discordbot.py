@@ -909,8 +909,13 @@ async def update_embed(ctx, date, msg):
     while True:
         if msg.deleted:  # Check if the message is deleted
             break
-        embed = discord.Embed(title="인증상황", description=f"{ctx.author.mention}의 {date} 일취월장 인증입니다")
-        await msg.edit(embed=embed)
+
+        view = discord.ui.View()
+        button = AuthButton(ctx, ctx.author, date)
+        view.add_item(button)
+        view.add_item(CancelButton(ctx))  # Add the CancelButton to the view
+
+        await msg.edit(embed=embed, view=view)
         await asyncio.sleep(60)  # Wait for 60 seconds before updating again
         
 @bot.command(name='인증')
