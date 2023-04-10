@@ -868,7 +868,6 @@ class CancelButton(discord.ui.Button):
     
     async def callback(self, interaction: discord.Interaction):
         if interaction.user == self.ctx.author:
-            interaction.message.deleted = True  # Set the deleted flag
             await interaction.message.delete()
             
 class AuthButton(discord.ui.Button):
@@ -912,6 +911,12 @@ async def update_embed(ctx, date, msg):
     while True:
         try:
             if button.stop_loop:  # Check if stop_loop is True before updating the message
+                break
+
+            # Check if the message is deleted using fetch_message
+            try:
+                await msg.channel.fetch_message(msg.id)
+            except NotFound:
                 break
 
             view = discord.ui.View(timeout=None)
