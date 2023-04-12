@@ -956,6 +956,20 @@ async def Authentication(ctx, date):
         return interaction.message.id == msg.id and interaction.data.get("component_type") == discord.ComponentType.button.value
 
     await bot.wait_for("interaction", check=check)
+
+#------------------------------------------------#
+@bot.command(name="역할")
+async def show_roles(ctx):
+    roles = ctx.author.roles[1:]  # Exclude the everyone role
+    embed = discord.Embed(title=f"{ctx.author.name}님의 역할입니다", color=0x00ff00)
+    
+    # Add each role and its icon to the embed's description
+    for role in roles:
+        embed.description = f"{embed.description}\n{role.mention}"
+        if role.icon:
+            embed.set_thumbnail(url=role.icon.url)
+            
+    await ctx.send(embed=embed)
     
 #Run the bot
 bot.run(TOKEN)
