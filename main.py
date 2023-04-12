@@ -1,9 +1,9 @@
 from discord.ext import commands
 from basic import easic
-from event1 import event1
+from slotm import slotm
 
 bot.add_cog(basic(bot))
-bot.add_cog(event1(bot))
+bot.add_cog(slotm(bot))
 
 if __name__ == '__main__':
     bot.run(TOKEN)
