@@ -16,6 +16,7 @@ googletrans==3.1.0a0
 google-auth
 google-auth-oauthlib
 gspread
+gspread_asyncio
 h11==0.9.0
 h2==3.2.0
 hpack==3.0.0
@@ -25,6 +26,7 @@ httpx==0.13.3
 hyperframe==5.2.0
 idna==2.10
 multidict==6.0.4
+pytz
 pipreqs==0.4.11
 python-dotenv==0.21.1
 requests==2.28.1
