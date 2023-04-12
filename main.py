@@ -1,3 +1,4 @@
+from discord.ext import commands
 from basic import easic
 from event1 import event1
 
