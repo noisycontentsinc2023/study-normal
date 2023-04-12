@@ -80,7 +80,7 @@ kst = pytz.timezone('Asia/Seoul')
 now = datetime.datetime.now(kst)
 
 
-class Slotm(commands.Cog):
+class slotm(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
