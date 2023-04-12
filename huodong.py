@@ -80,7 +80,7 @@ kst = pytz.timezone('Asia/Seoul')
 now = datetime.datetime.now(kst)
 
 
-class slotm(commands.Cog):
+class huodong(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
@@ -305,4 +305,4 @@ class slotm(commands.Cog):
 #------------------------------------------------#    
 
 def setup(bot):
-    bot.add_cog(slotm(bot))
+    bot.add_cog(huodong(bot))
