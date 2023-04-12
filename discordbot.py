@@ -965,7 +965,7 @@ async def show_roles(ctx):
     
     # Add each role and its icon to the embed's description
     for role in roles:
-        embed.description = f"{embed.description}\n{role.mention}"
+        embed.description = f"{embed.description}\n{role.name}"
         if role.icon:
             embed.set_thumbnail(url=role.icon.url)
             
