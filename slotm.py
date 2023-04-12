@@ -79,219 +79,224 @@ async def find_user(username, sheet):
 kst = pytz.timezone('Asia/Seoul')
 now = datetime.datetime.now(kst)
 
-@bot.command(name='등록')
-async def Register(ctx):
-    username = str(ctx.message.author)
-    
-    sheet3, rows = await get_sheet3()
 
-    row = 2
-    while (await sheet3.cell(row, 1)).value:
-        row += 1
-
-    await sheet3.update_cell(row, 1, username)
-
-    role = discord.utils.get(ctx.guild.roles, id=1093781563508015105)
-    await ctx.author.add_roles(role)
-
-    embed = discord.Embed(description=f"{ctx.author.mention}님, 랜덤미션스터디에 정상적으로 등록됐습니다!",
-                          color=0x00FF00)
-    await ctx.send(embed=embed)
-    
-class RandomMissionView(View):
-    def __init__(self, ctx: Context, message: discord.Message):
-        super().__init__(timeout=None)
-        self.ctx = ctx
-        self.message = message
-
-    @discord.ui.button(label='다시 뽑기')
-    async def random_mission_button(self, button: Button, interaction: discord.Interaction):
-        await self.message.delete()
-        await self.ctx.invoke(self.ctx.bot.get_command('再次'))
-
-
-@bot.command(name='미션')
-async def Random_Mission(ctx):
-    # Check if the user has the required role
-    required_role = discord.utils.get(ctx.guild.roles, id=1093781563508015105)
-    if required_role in ctx.author.roles:
-        if str(ctx.channel.id) == "1093780375890825246":
-            await lottery(ctx)
-        else:
-            await ctx.send("이 채널에서는 사용할 수 없는 명령입니다")
-    else:
-        # Send the message if the user does not have the required role
-        embed = discord.Embed(description="랜덤미션스터디 참여자만 !미션 명령어를 사용할 수 있어요", color=0xff0000)
-        await ctx.send(embed=embed)
-
-
-async def lottery(ctx):
-    choices = [('Mission 1', '★'), ('Mission 2', '★★'),
-               ('Mission 3', '★★★'),
-               ('Mission 4', '★★'), ('Mission Pass!', '★'), ('Mission 6', '★★'), ('Mission 7', '★★★'), ('Mission 8', '★★'),
-               ('Mission 9', '★★★'), ('Mission 10', '★★')]
-
-    embed = discord.Embed(title=f"{ctx.author.name}님의 오늘의 미션입니다!", color=0xff0000)
-    message = await ctx.send(embed=embed)
-    message_id = message.id
-    selected_choices = random.sample(choices, 10)
-
-    for i, (choice, difficulty) in enumerate(selected_choices):
-        embed.clear_fields()
-        embed.add_field(name=f'{i + 1} 미션', value=choice, inline=True)
-        embed.add_field(name='난이도', value=difficulty, inline=True)
-        await message.edit(embed=embed)
-        await asyncio.sleep(0.2)
-
-    result, difficulty = random.choice(selected_choices)
-    embed.clear_fields()
-    embed.add_field(name='난이도', value=difficulty, inline=False)
-    embed.set_footer(text='오늘의 미션입니다!')
-    view = RandomMissionView(ctx, message)
-    await message.edit(embed=embed, view=view)
-
-@bot.command(name='再次')
-async def Relottery(ctx):
-    choices = [('Mission 1', '★'), ('Mission 2', '★★'),
-               ('Mission 3', '★★★'),
-               ('Mission 4', '★★'), ('Mission Pass!', '★'), ('Mission 6', '★★'), ('Mission 7', '★★★'), ('Mission 8', '★★'),
-               ('Mission 9', '★★★'), ('Mission 10', '★★')]
-
-    embed = discord.Embed(title=f"{ctx.author.name}님의 다시 뽑기 결과입니다!", color=0xff0000)
-    message = await ctx.send(embed=embed)
-    message_id = message.id
-    selected_choices = random.sample(choices, 10)
-
-    for i, (choice, difficulty) in enumerate(selected_choices):
-        embed.clear_fields()
-        embed.add_field(name=f'{i + 1} 미션', value=choice, inline=True)
-        embed.add_field(name='난이도', value=difficulty, inline=True)
-        await message.edit(embed=embed)
-        await asyncio.sleep(0.2)
-
-    result, difficulty = random.choice(selected_choices)
-    embed.clear_fields()
-    embed.add_field(name='난이도', value=difficulty, inline=False)
-    embed.set_footer(text='오늘의 미션입니다!')
-    await message.edit(embed=embed, view=view)
-
-
-      
-@bot.command(name='미션인증')
-async def random_mission_auth(ctx):
-    sheet3, rows = await get_sheet3()  # get_sheet3 호출 결과값 받기
-    username = str(ctx.message.author)
-    # Check if the user has already authenticated today
-    today = now.strftime('%m%d')
-
-    user_row = None
-    for row in await sheet3.get_all_values():
-        if username in row:
-            user_row = row
-            break
-
-    if user_row is None:
-        embed = discord.Embed(title='Error', description='스라밸-랜덤미션스터디에 등록된 멤버가 아닙니다')
-        await ctx.send(embed=embed)
-        return
-
-    user_cell = await find_user(username, sheet3)
-
-    if user_cell is None:
-        embed = discord.Embed(title='Error', description='서버 기록 시트에 멤버가 등록되어 있지 않습니다')
-        await ctx.send(embed=embed)
-        return
-
-    today_col = None
-    for i, col in enumerate(await sheet3.row_values(1)):
-        if today in col:
-            today_col = i + 1
-            break
-
-    if today_col is None:
-        embed = discord.Embed(title='Error', description='오늘의 미션 열을 찾을 수 없습니다')
-        await ctx.send(embed=embed)
-        return
-
-    if (await sheet3.cell(user_cell.row, today_col)).value == '1':
-        embed = discord.Embed(title='Error', description='이미 오늘의 미션 인증을 하셨습니다')
-        await ctx.send(embed=embed)
-        return
-      
-    # create and send the message with the button
-    embed = discord.Embed(title="미션 인증", description="버튼을 눌러 미션 인증을 완료하세요!")
-    button = AuthButton2(ctx, username, today, sheet3)
-    view = discord.ui.View()
-    view.add_item(button)
-    await ctx.send(embed=embed, view=view)
+class Slotm(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
         
-class AuthButton2(discord.ui.Button):
-    def __init__(self, ctx, username, today, sheet3):
-        super().__init__(style=discord.ButtonStyle.green, label="미션인증")
-        self.ctx = ctx
-        self.username = username
-        self.today = today
-        self.sheet3 = sheet3
-        self.auth_event = asyncio.Event()
+    @commands.command(name='등록')
+    async def Register(ctx):
+        username = str(ctx.message.author)
 
-    async def callback(self, interaction: discord.Interaction):
-        if not any(role.id == 922400231549722664 for role in interaction.user.roles):
-            # If the user doesn't have the required role, send an error message
-            embed = discord.Embed(title='Error', description='권한이 없습니다 :(')
-            await interaction.response.edit_message(embed=embed, view=None)
-            return
+        sheet3, rows = await get_sheet3()
 
-        try:
-            user_row = (await self.sheet3.find(self.username)).row
-        except gspread.exceptions.CellNotFound:
-            embed = discord.Embed(title='Error', description='스라밸-랜덤미션스터디에 등록된 멤버가 아닙니다')
-            await interaction.response.edit_message(embed=embed, view=None)
-            return
+        row = 2
+        while (await sheet3.cell(row, 1)).value:
+            row += 1
 
-        # Authenticate the user in the spreadsheet
-        today_col = (await self.sheet3.find(self.today)).col  # 수정된 부분
-        await self.sheet3.update_cell(user_row, today_col, '1')  # 수정된 부분
+        await sheet3.update_cell(row, 1, username)
 
-        # Set the auth_event to stop the loop
-        self.auth_event.set()
-
-        # Remove the button from the view
-        self.view.clear_items()
-
-        # Send a success message
-        embed = discord.Embed(title='인증완료!', description=f'{self.username}님, 정상적으로 인증되셨습니다')
-        await interaction.response.edit_message(embed=embed, view=None)
-
-@bot.command(name='누적')
-async def mission_count(ctx):
-    username = str(ctx.message.author)
-    sheet3, rows = await get_sheet3()
-    
-    # Find the user's row in the Google Sheet
-    user_row = None
-    for row in await sheet3.get_all_values():
-        if username in row:
-            user_row = row
-            break
-
-    if user_row is None:
-        embed = discord.Embed(title='Error', description='스라밸-랜덤미션스터디에 등록된 멤버가 아닙니다')
-        await ctx.send(embed=embed)
-        return
-
-    user_cell = await sheet3.find(username)
-    count = int((await sheet3.cell(user_cell.row, 9)).value)  # Column I is the 9th column
-
-    # Send the embed message with the user's authentication count
-    embed = discord.Embed(description=f"{ctx.author.mention}님은 {count} 회 인증하셨어요!", color=0x00FF00)
-    await ctx.send(embed=embed)
-
-    # Check if the user's count is 6 or 7 and grant the Finisher role
-    if count in [6, 7]:
-        role = discord.utils.get(ctx.guild.roles, id=1093831438475989033)
+        role = discord.utils.get(ctx.guild.roles, id=1093781563508015105)
         await ctx.author.add_roles(role)
-        embed = discord.Embed(description="완주를 축하드립니다! 완주자 롤을 받으셨어요!", color=0x00FF00)
+
+        embed = discord.Embed(description=f"{ctx.author.mention}님, 랜덤미션스터디에 정상적으로 등록됐습니다!",
+                              color=0x00FF00)
         await ctx.send(embed=embed)
+
+    class RandomMissionView(View):
+        def __init__(self, ctx: Context, message: discord.Message):
+            super().__init__(timeout=None)
+            self.ctx = ctx
+            self.message = message
+
+        @discord.ui.button(label='다시 뽑기')
+        async def random_mission_button(self, button: Button, interaction: discord.Interaction):
+            await self.message.delete()
+            await self.ctx.invoke(self.ctx.bot.get_command('再次'))
+
+
+    @commands.command(name='미션')
+    async def Random_Mission(ctx):
+        # Check if the user has the required role
+        required_role = discord.utils.get(ctx.guild.roles, id=1093781563508015105)
+        if required_role in ctx.author.roles:
+            if str(ctx.channel.id) == "1093780375890825246":
+                await lottery(ctx)
+            else:
+                await ctx.send("이 채널에서는 사용할 수 없는 명령입니다")
+        else:
+            # Send the message if the user does not have the required role
+            embed = discord.Embed(description="랜덤미션스터디 참여자만 !미션 명령어를 사용할 수 있어요", color=0xff0000)
+            await ctx.send(embed=embed)
+
+
+    async def lottery(ctx):
+        choices = [('Mission 1', '★'), ('Mission 2', '★★'),
+                   ('Mission 3', '★★★'),
+                   ('Mission 4', '★★'), ('Mission Pass!', '★'), ('Mission 6', '★★'), ('Mission 7', '★★★'), ('Mission 8', '★★'),
+                   ('Mission 9', '★★★'), ('Mission 10', '★★')]
+
+        embed = discord.Embed(title=f"{ctx.author.name}님의 오늘의 미션입니다!", color=0xff0000)
+        message = await ctx.send(embed=embed)
+        message_id = message.id
+        selected_choices = random.sample(choices, 10)
+
+        for i, (choice, difficulty) in enumerate(selected_choices):
+            embed.clear_fields()
+            embed.add_field(name=f'{i + 1} 미션', value=choice, inline=True)
+            embed.add_field(name='난이도', value=difficulty, inline=True)
+            await message.edit(embed=embed)
+            await asyncio.sleep(0.2)
+
+        result, difficulty = random.choice(selected_choices)
+        embed.clear_fields()
+        embed.add_field(name='난이도', value=difficulty, inline=False)
+        embed.set_footer(text='오늘의 미션입니다!')
+        view = RandomMissionView(ctx, message)
+        await message.edit(embed=embed, view=view)
+
+    @commands.command(name='再次')
+    async def Relottery(ctx):
+        choices = [('Mission 1', '★'), ('Mission 2', '★★'),
+                   ('Mission 3', '★★★'),
+                   ('Mission 4', '★★'), ('Mission Pass!', '★'), ('Mission 6', '★★'), ('Mission 7', '★★★'), ('Mission 8', '★★'),
+                   ('Mission 9', '★★★'), ('Mission 10', '★★')]
+
+        embed = discord.Embed(title=f"{ctx.author.name}님의 다시 뽑기 결과입니다!", color=0xff0000)
+        message = await ctx.send(embed=embed)
+        message_id = message.id
+        selected_choices = random.sample(choices, 10)
+
+        for i, (choice, difficulty) in enumerate(selected_choices):
+            embed.clear_fields()
+            embed.add_field(name=f'{i + 1} 미션', value=choice, inline=True)
+            embed.add_field(name='난이도', value=difficulty, inline=True)
+            await message.edit(embed=embed)
+            await asyncio.sleep(0.2)
+
+        result, difficulty = random.choice(selected_choices)
+        embed.clear_fields()
+        embed.add_field(name='난이도', value=difficulty, inline=False)
+        embed.set_footer(text='오늘의 미션입니다!')
+        await message.edit(embed=embed, view=view)
+
+
+      
+    @commands.command(name='미션인증')
+    async def random_mission_auth(ctx):
+        sheet3, rows = await get_sheet3()  # get_sheet3 호출 결과값 받기
+        username = str(ctx.message.author)
+        # Check if the user has already authenticated today
+        today = now.strftime('%m%d')
+
+        user_row = None
+        for row in await sheet3.get_all_values():
+            if username in row:
+                user_row = row
+                break
+
+        if user_row is None:
+            embed = discord.Embed(title='Error', description='스라밸-랜덤미션스터디에 등록된 멤버가 아닙니다')
+            await ctx.send(embed=embed)
+            return
+
+        user_cell = await find_user(username, sheet3)
+
+        if user_cell is None:
+            embed = discord.Embed(title='Error', description='서버 기록 시트에 멤버가 등록되어 있지 않습니다')
+            await ctx.send(embed=embed)
+            return
+
+        today_col = None
+        for i, col in enumerate(await sheet3.row_values(1)):
+            if today in col:
+                today_col = i + 1
+                break
+
+        if today_col is None:
+            embed = discord.Embed(title='Error', description='오늘의 미션 열을 찾을 수 없습니다')
+            await ctx.send(embed=embed)
+            return
+
+        if (await sheet3.cell(user_cell.row, today_col)).value == '1':
+            embed = discord.Embed(title='Error', description='이미 오늘의 미션 인증을 하셨습니다')
+            await ctx.send(embed=embed)
+            return
+
+        # create and send the message with the button
+        embed = discord.Embed(title="미션 인증", description="버튼을 눌러 미션 인증을 완료하세요!")
+        button = AuthButton2(ctx, username, today, sheet3)
+        view = discord.ui.View()
+        view.add_item(button)
+        await ctx.send(embed=embed, view=view)
+        
+    class AuthButton2(discord.ui.Button):
+        def __init__(self, ctx, username, today, sheet3):
+            super().__init__(style=discord.ButtonStyle.green, label="미션인증")
+            self.ctx = ctx
+            self.username = username
+            self.today = today
+            self.sheet3 = sheet3
+            self.auth_event = asyncio.Event()
+
+        async def callback(self, interaction: discord.Interaction):
+            if not any(role.id == 922400231549722664 for role in interaction.user.roles):
+                # If the user doesn't have the required role, send an error message
+                embed = discord.Embed(title='Error', description='권한이 없습니다 :(')
+                await interaction.response.edit_message(embed=embed, view=None)
+                return
+
+            try:
+                user_row = (await self.sheet3.find(self.username)).row
+            except gspread.exceptions.CellNotFound:
+                embed = discord.Embed(title='Error', description='스라밸-랜덤미션스터디에 등록된 멤버가 아닙니다')
+                await interaction.response.edit_message(embed=embed, view=None)
+                return
+
+            # Authenticate the user in the spreadsheet
+            today_col = (await self.sheet3.find(self.today)).col  # 수정된 부분
+            await self.sheet3.update_cell(user_row, today_col, '1')  # 수정된 부분
+
+            # Set the auth_event to stop the loop
+            self.auth_event.set()
+
+            # Remove the button from the view
+            self.view.clear_items()
+
+            # Send a success message
+            embed = discord.Embed(title='인증완료!', description=f'{self.username}님, 정상적으로 인증되셨습니다')
+            await interaction.response.edit_message(embed=embed, view=None)
+
+    @commands.command(name='누적')
+    async def mission_count(ctx):
+        username = str(ctx.message.author)
+        sheet3, rows = await get_sheet3()
+
+        # Find the user's row in the Google Sheet
+        user_row = None
+        for row in await sheet3.get_all_values():
+            if username in row:
+                user_row = row
+                break
+
+        if user_row is None:
+            embed = discord.Embed(title='Error', description='스라밸-랜덤미션스터디에 등록된 멤버가 아닙니다')
+            await ctx.send(embed=embed)
+            return
+
+        user_cell = await sheet3.find(username)
+        count = int((await sheet3.cell(user_cell.row, 9)).value)  # Column I is the 9th column
+
+        # Send the embed message with the user's authentication count
+        embed = discord.Embed(description=f"{ctx.author.mention}님은 {count} 회 인증하셨어요!", color=0x00FF00)
+        await ctx.send(embed=embed)
+
+        # Check if the user's count is 6 or 7 and grant the Finisher role
+        if count in [6, 7]:
+            role = discord.utils.get(ctx.guild.roles, id=1093831438475989033)
+            await ctx.author.add_roles(role)
+            embed = discord.Embed(description="완주를 축하드립니다! 완주자 롤을 받으셨어요!", color=0x00FF00)
+            await ctx.send(embed=embed)
 
         
 #------------------------------------------------#
@@ -299,6 +304,5 @@ async def mission_count(ctx):
     
 #------------------------------------------------#    
 
-        
-#Run the bot
-bot.run(TOKEN)
+def setup(bot):
+    bot.add_cog(slotm(bot))
