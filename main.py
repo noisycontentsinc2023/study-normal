@@ -1,4 +1,4 @@
-from basic import easic
+from basic import basic
 
 bot.add_cog(basic(bot))
 
