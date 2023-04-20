@@ -1,6 +1,7 @@
 import basic
 import eventasyncio
 import asyncio
+import os
 from bot import get_bot
 
 TOKEN = os.environ['TOKEN']
