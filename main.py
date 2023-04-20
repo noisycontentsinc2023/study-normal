@@ -1,9 +1,11 @@
 import basic
 import eventasyncio
+import asyncio
 
-def main():
+async def main():
     basic.run_basic()
-    event.run_eventasyncio()
+    bot = eventasyncio.run_eventasyncio()
+    await bot.start("TOKEN")
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
