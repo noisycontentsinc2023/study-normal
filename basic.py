@@ -757,5 +757,6 @@ async def show_roles(ctx):
     await ctx.send(embed=embed)
     
 #Run the bot
-bot.run(TOKEN)
+def run_basic():
+    return bot
 
