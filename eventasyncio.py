@@ -17,6 +17,7 @@ import asyncio
 import discord.ui as ui
 import time
 
+from bot import get_bot
 from google.oauth2.service_account import Credentials
 from datetime import date, timedelta
 from discord import Embed
@@ -30,7 +31,7 @@ from discord.ui import Select, Button, View
 TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
-
+bot = get_bot()
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
