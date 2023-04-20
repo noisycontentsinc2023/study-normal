@@ -1,7 +1,9 @@
 import basic
 import eventasyncio
 
-bot.add_cog(basic(bot))
+def main():
+    basic.run_basic()
+    event.run_event()
 
 if __name__ == '__main__':
-    bot.run(TOKEN)
+    main()
