@@ -6,7 +6,7 @@ TOKEN = os.environ['TOKEN']
 
 async def main():
     bot = run_basic()
-    await bot.(TOKEN)
+    await bot.run(TOKEN)
     await run_eventasyncio()
     await bot.connect()
 
