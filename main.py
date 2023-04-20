@@ -3,6 +3,8 @@ import eventasyncio
 import asyncio
 from bot import get_bot
 
+TOKEN = os.environ['TOKEN']
+
 async def main():
     basic.run_basic()
     eventasyncio.run_eventasyncio()
