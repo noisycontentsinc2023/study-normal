@@ -4,7 +4,6 @@ import asyncio
 import os
 import urllib
 import requests
-import openai
 import datetime
 import random
 import json
