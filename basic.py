@@ -614,7 +614,7 @@ async def play_game(user_choice, ctx, user_emoji):
 async def MBTI(ctx):
     embed = discord.Embed(title="소울메이트 언어를 찾아보자!", description="당신의 외국어 mbti는..?", color=0xffd700)
     embed.set_footer(text="아래 버튼을 클릭하여 외국어 mbti를 알아봐요")
-    button = discord.ui.Button(style=discord.ButtonStyle.primary, label="나의 외국어 mbti 확인하", url="https://doda.app/quiz/89gxdaXnTI")
+    button = discord.ui.Button(style=discord.ButtonStyle.primary, label="나의 외국어 mbti 확인하기", url="https://doda.app/quiz/89gxdaXnTI")
     view = discord.ui.View()
     view.add_item(button)
     await ctx.send(embed=embed, view=view)
