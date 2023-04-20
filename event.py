@@ -354,3 +354,7 @@ async def on_message(message):
 
         new_message = await message.channel.send(sticky_messages[message.channel.id])
         last_sticky_messages[message.channel.id] = new_message
+        
+        
+#Run the bot
+bot.run(TOKEN)
