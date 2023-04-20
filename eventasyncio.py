@@ -27,16 +27,15 @@ from discord.utils import get
 from urllib.request import Request
 from discord.ui import Select, Button, View
 
-TOKEN = os.environ['TOKEN']
-PREFIX = os.environ['PREFIX']
+from bot import get_bot
 
-bot = get_bot(intents=intents)
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-intents.typing = False
-intents.presences = False
+bot = get_bot()
 
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+      
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds_info = {
   "type": "service_account",
@@ -54,12 +53,6 @@ creds_info = {
 credentials = Credentials.from_service_account_info(creds_info, scopes=scope)
 aio_creds = credentials
 
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    await bot.process_commands(message)
     
 #------------------------------------------------#
 
