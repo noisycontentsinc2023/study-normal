@@ -28,17 +28,17 @@ from discord.ext.commands import check, when_mentioned_or, CommandNotFound, has_
     ExpectedClosingQuoteError
 from collections import defaultdict
 
+TOKEN = os.environ['TOKEN']
+PREFIX = os.environ['PREFIX']
+
 intents = discord.Intents.default()
 intents.members = True
 intents.messages = True
+
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 naver_client_id = 'iuWr9aAAyKxNnRsRSQIt'
 naver_client_secret = 'bkfPugeyIa'
-
-
-TOKEN = os.environ['TOKEN']
-PREFIX = os.environ['PREFIX']
 
 baseurl = "https://studymini.com/"
 
