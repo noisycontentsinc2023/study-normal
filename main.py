@@ -15,11 +15,7 @@ intents.presences = False
 
 bot = get_bot()
 
-def main():
-    basic.run_basic()
-    eventasyncio.run_eventasyncio()
-
-    bot.run(TOKEN)
-
 if __name__ == '__main__':
-    main()
+    basic_bot = basic.run_basic()
+    eventasyncio.run_eventasyncio()
+    basic_bot.run(TOKEN)
