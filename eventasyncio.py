@@ -30,15 +30,12 @@ from discord.ui import Select, Button, View
 TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
-bot = get_bot()
+bot = get_bot(intents=intents)
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.typing = False
 intents.presences = False
-
-
-bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds_info = {
@@ -57,6 +54,13 @@ creds_info = {
 credentials = Credentials.from_service_account_info(creds_info, scopes=scope)
 aio_creds = credentials
 
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    await bot.process_commands(message)
+    
 #------------------------------------------------#
 
 # Set up Google Sheets worksheet
