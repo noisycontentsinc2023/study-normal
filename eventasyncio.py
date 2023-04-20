@@ -31,10 +31,12 @@ from bot import get_bot
 
 bot = get_bot()
 
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
+def setup(bot):
+    bot.add_cog(eventasyncio(bot))
+
+class eventasyncio(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
       
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds_info = {
