@@ -6,10 +6,16 @@ from bot import get_bot
 
 TOKEN = os.environ['TOKEN']
 
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+intents.typing = False
+intents.presences = False
+
 async def main():
-    basic.get_bot()
-    eventasyncio.get_bot()
-    bot = get_bot()
+    basic.run_basic()
+    eventasyncio.run_eventasyncio()
+    bot = get_bot(intents=intents)
     await bot.start(TOKEN)
 
 if __name__ == '__main__':
