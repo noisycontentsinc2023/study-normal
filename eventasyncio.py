@@ -27,9 +27,11 @@ from discord.utils import get
 from urllib.request import Request
 from discord.ui import Select, Button, View
 
-from bot import get_bot
 
-bot = get_bot()
+intents = discord.Intents.default()
+intents.members = True
+intents.messages = True
+bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 def setup(bot):
     bot.add_cog(eventasyncio(bot))
