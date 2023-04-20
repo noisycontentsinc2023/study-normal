@@ -630,5 +630,5 @@ async def show_roles(ctx):
     
 #Run the bot
 def run_basic():
-    return bot
+    bot.run(TOKEN)
 
