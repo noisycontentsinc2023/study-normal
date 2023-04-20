@@ -1,4 +1,5 @@
-from basic import basic
+import basic
+import eventasyncio
 
 bot.add_cog(basic(bot))
 
