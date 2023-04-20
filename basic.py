@@ -29,10 +29,9 @@ from discord.ext.commands import check, when_mentioned_or, CommandNotFound, has_
     ExpectedClosingQuoteError
 from collections import defaultdict
 
+bot = get_bot()
 intents = discord.Intents.default()
 intents.members = True
-
-bot = get_bot(intents=intents)
 
 naver_client_id = 'iuWr9aAAyKxNnRsRSQIt'
 naver_client_secret = 'bkfPugeyIa'
