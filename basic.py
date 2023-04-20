@@ -16,7 +16,6 @@ import json
 import gspread
 import re
 
-from bot import get_bot
 from google.oauth2 import service_account
 from bs4 import BeautifulSoup
 from discord import Embed
