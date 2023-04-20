@@ -357,4 +357,5 @@ async def on_message(message):
         
         
 #Run the bot
-bot.run(TOKEN)
+def run_eventasyncio():
+    return bot
