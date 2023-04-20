@@ -1,23 +1,18 @@
 import basic
 import eventasyncio
+import asyncio
 import os
-import discord
 from bot import get_bot
 
 TOKEN = os.environ['TOKEN']
-PREFIX = os.environ['PREFIX']
 
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
+async def main():
+    bot = get_bot()
 
-bot = commands.Bot(command_prefix=PREFIX, intents=intents)
+    basic.setup(bot)
+    eventasyncio.setup(bot)
 
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    await bot.start(TOKEN)
 
 if __name__ == '__main__':
-    bot.load_extension('basic')
-    bot.load_extension('eventasyncio')
-    bot.run(TOKEN)
+    asyncio.run(main())
