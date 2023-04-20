@@ -5,17 +5,12 @@ import discord
 from bot import get_bot
 
 TOKEN = os.environ['TOKEN']
-PREFIX = os.environ['PREFIX']
 
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-intents.typing = False
-intents.presences = False
-
-bot = get_bot()
+async def main():
+    basic.get_bot()
+    eventasyncio.get_bot()
+    bot = get_bot()
+    await bot.start(TOKEN)
 
 if __name__ == '__main__':
-    basic_bot = basic.run_basic()
-    eventasyncio.run_eventasyncio()
-    basic_bot.run(TOKEN)
+    asyncio.run(main())
