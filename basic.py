@@ -32,8 +32,7 @@ TOKEN = os.environ['TOKEN']
 PREFIX = os.environ['PREFIX']
 
 intents = discord.Intents.default()
-intents.members = True
-intents.messages = True
+intents.message_content = True
 
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
