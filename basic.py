@@ -42,12 +42,6 @@ naver_client_secret = 'bkfPugeyIa'
 
 baseurl = "https://studymini.com/"
 
-def setup(bot):
-    bot.add_cog(Basic(bot))
-
-class Basic(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
         
 @bot.command(name='사용', aliases=['사용법', '도움말'])
 async def usage(ctx):
