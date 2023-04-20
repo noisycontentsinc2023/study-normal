@@ -10,7 +10,7 @@ async def main():
     basic.run_basic()
     eventasyncio.run_eventasyncio()
     bot = get_bot()
-    await bot.start(TOKEN)
+    await bot.run(TOKEN)
 
 if __name__ == '__main__':
     asyncio.run(main())
