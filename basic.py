@@ -645,8 +645,6 @@ descriptions = ["시작점", "A", "B", "C", "D", "E", "F", "G", "H", "I",
                 "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
                 "T", "U", "V", "W", "X", "Y", "Z"]
 
-# 디스코드 봇 객체 생성
-bot = commands.Bot(command_prefix='!')
 
 # 봇이 준비되면 호출되는 이벤트 핸들러 함수
 @bot.event
