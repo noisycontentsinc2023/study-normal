@@ -649,7 +649,7 @@ RED = (255, 0, 0)
 
 # Pygame 초기화
 pygame.init()
-pygame.mixer()
+pygame.mixer.quit()
 
 # 게임 객체
 class Snake:
