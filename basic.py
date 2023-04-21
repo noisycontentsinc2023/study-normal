@@ -751,11 +751,9 @@ def run_game():
     # Pygame 종료
     pygame.quit()
 
-# 디스코드 봇 객체
-bot = commands.Bot(command_prefix='!')
 
 # 명령어 등록
-@bot.command()
+@bot.command(name='뱀')
 async def snake(ctx):
     # 게임 실행
     run_game()
