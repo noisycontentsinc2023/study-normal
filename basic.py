@@ -635,128 +635,66 @@ async def show_roles(ctx):
     await ctx.send(embed=embed)
 
     
-# 게임 설정
-WIDTH = 640
-HEIGHT = 480
-FPS = 10
-BLOCK_SIZE = 20
+# 브루마블 게임판
+board = ["START", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+         "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", 
+         "21", "22", "23", "24", "25"]
 
-# 색깔 설정
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
+# 게임판의 각 칸의 설명
+descriptions = ["시작점", "A", "B", "C", "D", "E", "F", "G", "H", "I",
+                "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+                "T", "U", "V", "W", "X", "Y", "Z"]
 
-# Pygame 초기화
-pygame.init()
-pygame.mixer.quit()
+# 디스코드 봇 객체 생성
+bot = commands.Bot(command_prefix='!')
 
-# 게임 객체
-class Snake:
-    def __init__(self):
-        self.x = WIDTH // 2
-        self.y = HEIGHT // 2
-        self.vx = BLOCK_SIZE
-        self.vy = 0
-        self.body = [(self.x, self.y)]
+# 봇이 준비되면 호출되는 이벤트 핸들러 함수
+@bot.event
+async def on_ready():
+    print(f'{bot.user}이(가) 로그인하였습니다!')
 
-    def move(self):
-        self.x += self.vx
-        self.y += self.vy
+# 주사위를 굴려 게임판을 이동하는 함수
+def roll_dice():
+    return random.randint(1, 6)
 
-        if self.x >= WIDTH:
-            self.x = 0
-        elif self.x < 0:
-            self.x = WIDTH - BLOCK_SIZE
+# 게임판을 임베드 메시지 형태로 반환하는 함수
+def get_board_embed(position):
+    # Embed 객체 생성
+    embed = discord.Embed(title="브루마블 게임판", color=0xFF5733)
 
-        if self.y >= HEIGHT:
-            self.y = 0
-        elif self.y < 0:
-            self.y = HEIGHT - BLOCK_SIZE
+    # 게임판 Embed에 Field 추가
+    for i in range(25):
+        # 현재 위치에는 표시
+        if i == position:
+            embed.add_field(name=f":red_square: {board[i]}", value=f":arrow_right: {descriptions[i]}", inline=True)
+        else:
+            embed.add_field(name=board[i], value=descriptions[i], inline=True)
 
-        self.body.insert(0, (self.x, self.y))
+    return embed
 
-    def draw(self, surface):
-        for block in self.body:
-            rect = pygame.Rect(block[0], block[1], BLOCK_SIZE, BLOCK_SIZE)
-            pygame.draw.rect(surface, GREEN, rect)
+# 봇이 명령어를 받으면 호출되는 이벤트 핸들러 함수
+@bot.command(name='월드')
+async def start(ctx):
+    # 현재 위치
+    position = 0
+    # 게임판 Embed 메시지 생성
+    board_embed = await ctx.send(embed=get_board_embed(position))
 
-    def grow(self):
-        self.body.append(self.body[-1])
+    # 주사위 굴리기 반복
+    while True:
+        # 사용자로부터 주사위 굴리기 입력 받기
+        await ctx.send("주사위를 굴리려면 !roll을 입력하세요.")
+        response = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.content == "!roll")
 
-    def collide(self):
-        return any(block != self.body[0] and block == self.body[0] for block in self.body)
+        # 주사위 값 계산
+        dice_value = roll_dice()
 
-class Food:
-    def __init__(self):
-        self.x = random.randrange(0, WIDTH - BLOCK_SIZE, BLOCK_SIZE)
-        self.y = random.randrange(0, HEIGHT - BLOCK_SIZE, BLOCK_SIZE)
+        # 게임판 위치 업데이트
+        position += dice_value
+        position %= 25
 
-    def draw(self, surface):
-        rect = pygame.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
-        pygame.draw.rect(surface, RED, rect)
-
-    def check_collision(self, snake):
-        return self.x == snake.x and self.y == snake.y
-
-# 게임 루프
-def run_game():
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Snake Game")
-    clock = pygame.time.Clock()
-
-    snake = Snake()
-    food = Food()
-
-    running = True
-    while running:
-        # 입력 처리
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    if snake.vx != BLOCK_SIZE:
-                        snake.vx = -BLOCK_SIZE
-                        snake.vy = 0
-                elif event.key == pygame.K_RIGHT:
-                    if snake.vx != -BLOCK_SIZE:
-                        snake.vx = BLOCK_SIZE
-                        snake.vy = 0
-                elif event.key == pygame.K_UP:
-                    if snake.vy != BLOCK_SIZE:
-                        snake.vx = 0
-                        snake.vy = -BLOCK_SIZE
-                elif event.key == pygame.K_DOWN:
-                    if snake.vy != -BLOCK_SIZE:
-                        snake.vx = 0
-                        snake.vy = BLOCK_SIZE
-        # 게임 상태 업데이트
-        snake.move()
-        if food.check_collision(snake):
-            snake.grow()
-            food = Food()
-
-        if snake.collide():
-            running = False
-
-        # 그리기
-        screen.fill(BLACK)
-        snake.draw(screen)
-        food.draw(screen)
-
-        pygame.display.flip()
-        clock.tick(FPS)
-
-    # Pygame 종료
-    pygame.quit()
-
-
-# 명령어 등록
-@bot.command(name='뱀')
-async def snake(ctx):
-    # 게임 실행
-    run_game()
+        # 게임판 Embed 메시지 갱신
+        await board_embed.edit(embed=get_board_embed(position))
 
 #Run the bot
 bot.run(TOKEN)
