@@ -15,6 +15,7 @@ import aiofiles
 import json
 import gspread
 import re
+import pygame
 
 from google.oauth2 import service_account
 from bs4 import BeautifulSoup
@@ -632,7 +633,133 @@ async def show_roles(ctx):
             embed.set_thumbnail(url=role.icon.url)
             
     await ctx.send(embed=embed)
+
     
+# 게임 설정
+WIDTH = 640
+HEIGHT = 480
+FPS = 10
+BLOCK_SIZE = 20
+
+# 색깔 설정
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+# Pygame 초기화
+pygame.init()
+pygame.mixer.init()
+
+# 게임 객체
+class Snake:
+    def __init__(self):
+        self.x = WIDTH // 2
+        self.y = HEIGHT // 2
+        self.vx = BLOCK_SIZE
+        self.vy = 0
+        self.body = [(self.x, self.y)]
+
+    def move(self):
+        self.x += self.vx
+        self.y += self.vy
+
+        if self.x >= WIDTH:
+            self.x = 0
+        elif self.x < 0:
+            self.x = WIDTH - BLOCK_SIZE
+
+        if self.y >= HEIGHT:
+            self.y = 0
+        elif self.y < 0:
+            self.y = HEIGHT - BLOCK_SIZE
+
+        self.body.insert(0, (self.x, self.y))
+
+    def draw(self, surface):
+        for block in self.body:
+            rect = pygame.Rect(block[0], block[1], BLOCK_SIZE, BLOCK_SIZE)
+            pygame.draw.rect(surface, GREEN, rect)
+
+    def grow(self):
+        self.body.append(self.body[-1])
+
+    def collide(self):
+        return any(block != self.body[0] and block == self.body[0] for block in self.body)
+
+class Food:
+    def __init__(self):
+        self.x = random.randrange(0, WIDTH - BLOCK_SIZE, BLOCK_SIZE)
+        self.y = random.randrange(0, HEIGHT - BLOCK_SIZE, BLOCK_SIZE)
+
+    def draw(self, surface):
+        rect = pygame.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
+        pygame.draw.rect(surface, RED, rect)
+
+    def check_collision(self, snake):
+        return self.x == snake.x and self.y == snake.y
+
+# 게임 루프
+def run_game():
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Snake Game")
+    clock = pygame.time.Clock()
+
+    snake = Snake()
+    food = Food()
+
+    running = True
+    while running:
+        # 입력 처리
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    if snake.vx != BLOCK_SIZE:
+                        snake.vx = -BLOCK_SIZE
+                        snake.vy = 0
+                elif event.key == pygame.K_RIGHT:
+                    if snake.vx != -BLOCK_SIZE:
+                        snake.vx = BLOCK_SIZE
+                        snake.vy = 0
+                elif event.key == pygame.K_UP:
+                    if snake.vy != BLOCK_SIZE:
+                        snake.vx = 0
+                        snake.vy = -BLOCK_SIZE
+                elif event.key == pygame.K_DOWN:
+                    if snake.vy != -BLOCK_SIZE:
+                        snake.vx = 0
+                        snake.vy = BLOCK_SIZE
+        # 게임 상태 업데이트
+        snake.move()
+        if food.check_collision(snake):
+            snake.grow()
+            food = Food()
+
+        if snake.collide():
+            running = False
+
+        # 그리기
+        screen.fill(BLACK)
+        snake.draw(screen)
+        food.draw(screen)
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+    # Pygame 종료
+    pygame.quit()
+
+# 디스코드 봇 객체
+bot = commands.Bot(command_prefix='!')
+
+# 명령어 등록
+@bot.command()
+async def snake(ctx):
+    # 게임 실행
+    run_game()
+
 #Run the bot
 bot.run(TOKEN)
 
