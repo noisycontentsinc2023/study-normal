@@ -611,7 +611,7 @@ async def play_game(user_choice, ctx, user_emoji):
     
 #------------------------------------------------#
 
-@bot.command(name='mbti')
+@bot.command(name='MBTI')
 async def MBTI(ctx):
     embed = discord.Embed(title="소울메이트 언어를 찾아보자!", description="당신의 외국어 mbti는..?", color=0xffd700)
     embed.set_footer(text="아래 버튼을 클릭하여 외국어 mbti를 알아봐요")
