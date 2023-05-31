@@ -92,7 +92,7 @@ async def lotto(ctx):
 
     print(Text.strip())
     embed = discord.Embed(
-        title=" 망령의 추천 번호는!",
+        title="망령의 추천 번호는!",
         description=Text.strip(),
         colour=discord.Color.red()
     )
