@@ -54,10 +54,6 @@ async def usage(ctx):
     embed.add_field(name='!공부', value='오늘 공부할까? 말까!? 정해드립니다!', inline=False)
     embed.add_field(name='!운세', value='2023년 운세 외국어로 알아보기!', inline=False)
     embed.add_field(name='!메뉴추천', value='메뉴를 추천 받을 수 있습니다', inline=False)
-    embed.add_field(name='!메모 [내용]', value='메모를 추가합니다', inline=False)
-    embed.add_field(name='!메모보기', value='자신의 메모를 확인합니다', inline=False)
-    embed.add_field(name='!메모삭제 [번호]', value='자신의 메모를 삭제합니다', inline=False)
-    embed.add_field(name='!전체삭제', value='자신의 모든 메모를 삭제합니다', inline=False)
     await ctx.send(embed=embed)
     
 #------------------------------------------------로또------------------------------------------------------#
